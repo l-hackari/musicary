@@ -1,0 +1,38 @@
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import musicary.graphics.panes.MServerArtistTab?>
+<?import musicary.graphics.panes.MServerAlbumTab?>
+<?import musicary.graphics.panes.MServerGenreTab?>
+<?import musicary.graphics.panes.MServerSongTab?>
+<TabPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" tabClosingPolicy="UNAVAILABLE" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1">
+    <tabs>
+        <Tab text="Artisti">
+            <content>
+                <MServerArtistTab>
+
+                </MServerArtistTab>
+            </content>
+        </Tab>
+        <Tab text="Genre">
+            <content>
+                <MServerGenreTab>
+
+                </MServerGenreTab>
+            </content>
+        </Tab>
+        <Tab text="Album">
+            <content>
+                <MServerAlbumTab>
+
+                </MServerAlbumTab>
+            </content>
+        </Tab>
+        <Tab text="Brani">
+            <content>
+                <MServerSongTab>
+
+                </MServerSongTab>
+            </content>
+        </Tab>
+    </tabs>
+</TabPane>

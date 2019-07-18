@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import musicary.graphics.components.MButtonVariant?>
+<?import musicary.graphics.components.MTextWhiteField?>
+
+<ScrollPane xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/8.0.172-ea" fx:controller="musicary.controllers.ServerGenreController">
+    <HBox alignment="CENTER">
+        <children>
+            <BorderPane>
+                <top>
+                    <Label text="Modifica artista esistente" textFill="#ff004e" BorderPane.alignment="CENTER">
+                        <font>
+                            <Font size="24.0" />
+                        </font>
+                        <BorderPane.margin>
+                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                        </BorderPane.margin>
+                    </Label>
+                </top>
+                <center>
+                    <VBox alignment="CENTER">
+                        <ComboBox fx:id="genresList" onAction="#showGenreInfo" prefWidth="150.0" BorderPane.alignment="CENTER">
+                            <items>
+                            </items>
+                            <VBox.margin>
+                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                            </VBox.margin>
+                        </ComboBox>
+                        <VBox fx:id="editGenreForm" alignment="CENTER" visible="false" BorderPane.alignment="CENTER">
+                            <children>
+                                <MButtonVariant onMouseClicked="#deleteGenre" text="Elimina genere">
+                                    <VBox.margin>
+                                        <Insets bottom="10.0" top="30.0" />
+                                    </VBox.margin></MButtonVariant>
+                                <Label text="Oppure" textFill="#ff004e">
+                                    <VBox.margin>
+                                        <Insets bottom="20.0" left="10.0" right="10.0" top="10.0" />
+                                    </VBox.margin></Label>
+                                <Label text="Nome genere" textFill="#ff004e">
+                                    <VBox.margin>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                    </VBox.margin></Label>
+                                <MTextWhiteField fx:id="artistNameSelected" maxWidth="300" />
+                                <MButtonVariant onMouseClicked="#checkEditGenre" text="Invia">
+                                    <VBox.margin>
+                                        <Insets bottom="10.0" top="30.0" />
+                                    </VBox.margin></MButtonVariant>
+                            </children>
+                        </VBox>
+                    </VBox>
+                </center>
+                <HBox.margin>
+                    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                </HBox.margin>
+            </BorderPane>
+            <Separator orientation="VERTICAL" />
+            <BorderPane>
+                <top>
+                    <Label text="Inserisci nuovo genere" textFill="#ff004e" BorderPane.alignment="CENTER">
+                        <font>
+                            <Font size="24.0" />
+                        </font>
+                        <BorderPane.margin>
+                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                        </BorderPane.margin>
+                    </Label>
+                </top>
+                <center>
+                    <VBox alignment="CENTER" BorderPane.alignment="CENTER">
+                        <children>
+                            <Label text="Nome genere" textFill="#ff004e">
+                                <VBox.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="56.0" />
+                                </VBox.margin></Label>
+                            <MTextWhiteField fx:id="artistName" maxWidth="300" />
+                            <MButtonVariant onMouseClicked="#checkNewGenre" text="Invia">
+                                <VBox.margin>
+                                    <Insets bottom="10.0" top="30.0" />
+                                </VBox.margin></MButtonVariant>
+                        </children>
+                    </VBox>
+                </center>
+                <HBox.margin>
+                    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                </HBox.margin>
+            </BorderPane>
+        </children>
+    </HBox>
+</ScrollPane>

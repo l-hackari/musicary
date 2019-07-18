@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import musicary.graphics.components.MButtonVariant?>
+<?import musicary.graphics.components.MTextWhiteField?>
+<?import javafx.scene.control.ScrollPane?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="musicary.controllers.ServerAlbumController">
+    <HBox alignment="CENTER">
+        <children>
+            <BorderPane>
+                <top>
+                    <Label text="Modifica album esistente" textFill="#ff004e" BorderPane.alignment="CENTER">
+                        <font>
+                            <Font size="24.0" />
+                        </font>
+                        <BorderPane.margin>
+                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                        </BorderPane.margin>
+                    </Label>
+                </top>
+                <center>
+                    <VBox alignment="CENTER">
+                        <Label text="Seleziona l'artista dell'album" textFill="#ff004e">
+                            <VBox.margin>
+                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                            </VBox.margin></Label>
+                        <ComboBox fx:id="artistEditSelectionList" onAction="#showAlbumArtistSelectedList" prefWidth="150.0" BorderPane.alignment="CENTER">
+                            <items>
+                            </items>
+                            <VBox.margin>
+                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                            </VBox.margin>
+                        </ComboBox>
+                        <Label text="Seleziona l'album" textFill="#ff004e">
+                            <VBox.margin>
+                                <Insets bottom="10.0" left="10.0" right="10.0" top="20.0" />
+                            </VBox.margin></Label>
+                        <ComboBox fx:id="albumArtistSelectedList" onAction="#showEditAlbumInfos" prefWidth="150.0" BorderPane.alignment="CENTER">
+                            <items>
+                            </items>
+                            <VBox.margin>
+                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                            </VBox.margin>
+                        </ComboBox>
+                        <VBox fx:id="editAlbumForm" alignment="CENTER" visible="false" BorderPane.alignment="CENTER">
+                            <children>
+                                <MButtonVariant onMouseClicked="#deleteAlbum" text="Elimina Album">
+                                    <VBox.margin>
+                                        <Insets bottom="10.0" top="30.0" />
+                                    </VBox.margin></MButtonVariant>
+                                <Label text="Oppure" textFill="#ff004e">
+                                    <VBox.margin>
+                                        <Insets bottom="20.0" left="10.0" right="10.0" top="10.0" />
+                                    </VBox.margin></Label>
+                                <Label text="Nome Album" textFill="#ff004e">
+                                    <VBox.margin>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                    </VBox.margin></Label>
+                                <MTextWhiteField fx:id="editAlbumNameTextField" maxWidth="300" />
+                                <Label text="Anno di rilascio" textFill="#ff004e">
+                                    <VBox.margin>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                    </VBox.margin></Label>
+                                <MTextWhiteField fx:id="editReleaseDateTextField" maxWidth="300" />
+                                <Label text="Carica cover album" textFill="#ff004e">
+                                    <VBox.margin>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                    </VBox.margin></Label>
+                                <MButtonVariant onMouseClicked="#loadCoverEditAlbum" text="Carica file">
+                                    <VBox.margin>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                    </VBox.margin></MButtonVariant>
+                                <MButtonVariant onMouseClicked="#checkEditAlbum" text="Invia">
+                                    <VBox.margin>
+                                        <Insets bottom="10.0" top="30.0" />
+                                    </VBox.margin></MButtonVariant>
+                            </children>
+                        </VBox>
+                    </VBox>
+                </center>
+                <HBox.margin>
+                    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                </HBox.margin>
+            </BorderPane>
+            <Separator orientation="VERTICAL" />
+            <BorderPane>
+                <top>
+                    <Label text="Carica nuovo album" textFill="#ff004e" BorderPane.alignment="CENTER">
+                        <font>
+                            <Font size="24.0" />
+                        </font>
+                        <BorderPane.margin>
+                            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                        </BorderPane.margin>
+                    </Label>
+                </top>
+                <center>
+                    <VBox alignment="CENTER">
+                        <Label text="Seleziona l'artista dell'album" textFill="#ff004e">
+                            <VBox.margin>
+                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                            </VBox.margin></Label>
+                        <ComboBox fx:id="artistList" prefWidth="150.0" BorderPane.alignment="CENTER">
+                            <items>
+                            </items>
+                            <VBox.margin>
+                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                            </VBox.margin>
+                        </ComboBox>
+                        <VBox alignment="CENTER" BorderPane.alignment="CENTER">
+                            <children>
+                                <Label text="Nome Album" textFill="#ff004e">
+                                    <VBox.margin>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                    </VBox.margin></Label>
+                                <MTextWhiteField fx:id="artistNameTextField" maxWidth="300" />
+                                <Label text="Anno di rilascio" textFill="#ff004e">
+                                    <VBox.margin>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                    </VBox.margin></Label>
+                                <MTextWhiteField fx:id="albumReleaseDateTextField" maxWidth="300" />
+                                <Label text="Carica cover album" textFill="#ff004e">
+                                    <VBox.margin>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                    </VBox.margin></Label>
+                                <MButtonVariant onMouseClicked="#loadCoverAlbum" text="Carica file">
+                                    <VBox.margin>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                    </VBox.margin></MButtonVariant>
+                                <MButtonVariant onMouseClicked="#checkAlbum" text="Invia">
+                                    <VBox.margin>
+                                        <Insets bottom="10.0" top="30.0" />
+                                    </VBox.margin></MButtonVariant>
+                            </children>
+                        </VBox>
+                    </VBox>
+                </center>
+                <HBox.margin>
+                    <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                </HBox.margin>
+            </BorderPane>
+        </children>
+    </HBox>
+</ScrollPane>

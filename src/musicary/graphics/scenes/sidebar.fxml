@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.VBox?>
+<?import musicary.graphics.components.MMenuHomeButton?>
+<?import musicary.graphics.components.MMenuGenresButton?>
+<?import musicary.graphics.components.MMenuChartsButton?>
+<?import musicary.graphics.components.MMenuProfileButton?>
+<?import musicary.graphics.components.MMenuLogoutButton?>
+<VBox fx:controller="musicary.graphics.scenes.sidebarController" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1">
+    <children>
+        <MMenuHomeButton />
+        <MMenuGenresButton fx:id="genresHomeButton" onMouseClicked="#loadGenres" />
+        <MMenuChartsButton />
+        <MMenuProfileButton />
+        <MMenuLogoutButton />
+    </children>
+</VBox>
