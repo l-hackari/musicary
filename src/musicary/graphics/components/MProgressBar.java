@@ -9,13 +9,21 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
+import musicary.controllers.MainController;
 
 public class MProgressBar extends ProgressBar {
+
+    private int actualSecond;
 
     public MProgressBar(){
         this.setProgress(0.0);
         setMouseEvents();
         setAppearance();
+    }
+
+    public void setSeconds(double percentage){
+        System.out.println(percentage);
+        this.setProgress(percentage);
     }
 
     private void setMouseEvents(){

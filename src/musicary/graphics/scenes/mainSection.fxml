@@ -1,40 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 <?import musicary.graphics.components.MAudioPicture?>
 <?import musicary.graphics.components.MMenuChartsButton?>
 <?import musicary.graphics.components.MMenuGenresButton?>
 <?import musicary.graphics.components.MMenuHomeButton?>
-<?import musicary.graphics.components.MMenuProfileButton?>
 <?import musicary.graphics.components.MMenuLogoutButton?>
+<?import musicary.graphics.components.MMenuProfileButton?>
 <?import musicary.graphics.components.MPlayerLink?>
-
-<?import musicary.graphics.panes.MMainSection?>
-<?import javafx.scene.effect.DropShadow?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.control.Label?>
 <?import musicary.graphics.components.MProgressBar?>
-<?import javafx.scene.text.Font?>
-<BorderPane prefHeight="500" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="musicary.controllers.MainController">
+<?import musicary.graphics.panes.MMainSection?>
+
+<BorderPane prefHeight="500" xmlns="http://javafx.com/javafx/8.0.172-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="musicary.controllers.MainController">
     <left>
         <VBox style="-fx-background-color: #ff004e;" BorderPane.alignment="CENTER">
             <children>
                 <MMenuHomeButton fx:id="homeButton" onMouseClicked="#loadHome" />
                 <MMenuGenresButton fx:id="genresHomeButton" onMouseClicked="#loadGenres" />
-                <MMenuChartsButton fx:id="chartsHomeButton" onMouseClicked="#loadCharts"/>
-                <MMenuProfileButton fx:id="profileHomeButton" onMouseClicked="#loadProfilePage"/>
-                <MMenuLogoutButton fx:id="logoutHomeButton" onMouseClicked="#doLogOut"/>
+                <MMenuChartsButton fx:id="chartsHomeButton" onMouseClicked="#loadCharts" />
+                <MMenuProfileButton fx:id="profileHomeButton" onMouseClicked="#loadProfilePage" />
+                <MMenuLogoutButton fx:id="logoutHomeButton" onMouseClicked="#doLogOut" />
                 <Pane VBox.vgrow="ALWAYS" />
                 <VBox alignment="CENTER" style="-fx-background-color: #f5f5f5;" BorderPane.alignment="CENTER">
                     <children>
-                        <MPlayerLink fx:id="playingAudioAlbum" text="Californication" onMouseClicked="#redirectArtist">
+                        <MPlayerLink fx:id="playingAudioAlbum" onMouseClicked="#redirectArtist" text="Californication">
                             <VBox.margin>
                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                             </VBox.margin></MPlayerLink>
@@ -46,7 +45,7 @@
                                 <Image url="file:/home/zane/Development/Java%20Projects/musicary/res/images/cover.jpg" />
                             </image>
                         </MAudioPicture>
-                        <MPlayerLink fx:id="playingAudioArtist" layoutX="15.0" layoutY="15.0" text="Red Hot Chili Peppers" onMouseClicked="#redirectArtist">
+                        <MPlayerLink fx:id="playingAudioArtist" layoutX="15.0" layoutY="15.0" onMouseClicked="#redirectArtist" text="Red Hot Chili Peppers">
                             <VBox.margin>
                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                             </VBox.margin>
@@ -62,7 +61,7 @@
    <center>
       <ScrollPane fitToHeight="true" fitToWidth="true" style="-fx-background-color: #f5f5f5;" BorderPane.alignment="CENTER">
          <content>
-             <MMainSection fx:id="mainSection"></MMainSection>
+             <MMainSection fx:id="mainSection" />
          </content>
       </ScrollPane>
    </center>
@@ -76,17 +75,17 @@
             <top>
                 <HBox alignment="CENTER" maxWidth="1.7976931348623157E308" prefHeight="80.0" BorderPane.alignment="CENTER">
                     <children>
-                        <ImageView fx:id="backAudioButton" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fx:id="backAudioButton" fitHeight="50.0" fitWidth="50.0" onMouseClicked="#playPreviousAudio" pickOnBounds="true" preserveRatio="true">
                             <image>
                                 <Image url="file:/home/zane/Development/Java%20Projects/musicary/res/components/images/playback.png" />
                             </image>
                         </ImageView>
-                        <ImageView fx:id="playAudioButton" onMouseClicked="#playOrPauseClick" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fx:id="playAudioButton" fitHeight="50.0" fitWidth="50.0" onMouseClicked="#playOrPauseClick" pickOnBounds="true" preserveRatio="true">
                             <image>
                                 <Image url="file:/home/zane/Development/Java%20Projects/musicary/res/components/images/play.png" />
                             </image>
                         </ImageView>
-                        <ImageView fx:id="nextAudioButton" fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fx:id="nextAudioButton" fitHeight="50.0" fitWidth="50.0" onMouseClicked="#playNextAudio" pickOnBounds="true" preserveRatio="true">
                             <image>
                                 <Image url="file:/home/zane/Development/Java%20Projects/musicary/res/components/images/playnext.png" />
                             </image>
@@ -100,7 +99,7 @@
             <center>
                 <HBox alignment="CENTER" maxWidth="1.7976931348623157E308" BorderPane.alignment="CENTER">
                     <children>
-                        <Label text="0:15" textFill="#ff004e" HBox.hgrow="ALWAYS">
+                        <Label fx:id="actualSongTime" text="00:00" textFill="#ff004e" HBox.hgrow="ALWAYS">
                             <HBox.margin>
                                 <Insets bottom="10.0" left="5.0" right="5.0" />
                             </HBox.margin>
@@ -108,11 +107,12 @@
                                 <Font name="System Bold" size="13.0" />
                             </font>
                         </Label>
-                        <MProgressBar maxWidth="1.7976931348623157E308" progress="0.0" stylesheets="file:/home/zane/Development/Java%20Projects/musicary/res/components/css/main.css" HBox.hgrow="ALWAYS">
+                        <MProgressBar fx:id="progressBar" maxWidth="1.7976931348623157E308" progress="0.0"
+                                      stylesheets="file:/home/zane/Development/Java%20Projects/musicary/res/components/css/main.css" HBox.hgrow="ALWAYS">
                             <HBox.margin>
                                 <Insets bottom="10.0" />
                             </HBox.margin></MProgressBar>
-                        <Label text="3:10" textFill="#ff004e">
+                        <Label fx:id="endSongTime" text="00:00" textFill="#ff004e">
                             <HBox.margin>
                                 <Insets bottom="10.0" left="5.0" right="5.0" />
                             </HBox.margin>

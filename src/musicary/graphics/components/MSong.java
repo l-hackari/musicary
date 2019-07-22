@@ -8,6 +8,10 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import musicary.controllers.MainController;
+import musicary.model.Song;
+import musicary.model.client.RequestManager;
+
+import java.io.IOException;
 
 public class MSong extends HBox {
 
@@ -20,25 +24,22 @@ public class MSong extends HBox {
     private MSongLabel chartPosition;
     private Image playImage;
     private Image pauseImage;
-    private ImageView coverImage;
     private Pane spacing;
     private boolean isPlaying = false;
     private MainController controller;
+    private Song song;
 
-
-    public MSong(String chartPosition, Image playImage, Image pauseImage, ImageView coverImage,
-                 String name, String artist, String album,
-                 String songDuration, int views, MainController controller){
-        this.coverImage = coverImage;
+    public MSong(Song song, Image playImage, Image pauseImage, MainController controller){
+        this.song = song;
         this.controller = controller;
-        this.chartPosition = new MSongLabel(chartPosition);
-        songName = new MSongLabel(name);
+        this.chartPosition = new MSongLabel(Integer.toString(song.getChartPosition()));
+        songName = new MSongLabel(song.getTitle());
         this.playImage = playImage;
         this.pauseImage = pauseImage;
-        duration = new MSongLabel(songDuration);
-        this.views = new MSongLabel(Integer.toString(views));
-        this.artist = new MSongLabel(artist);
-        this.album = new MSongLabel(album);
+        duration = new MSongLabel(secToString(song.getDuration()));
+        this.views = new MSongLabel(Integer.toString(song.getViews()));
+        this.artist = new MSongLabel(song.getArtist());
+        this.album = new MSongLabel(song.getAlbum());
         spacing = new Pane();
         playButton = new ImageView(playImage);
         setPlayMouseEvent();
@@ -56,6 +57,14 @@ public class MSong extends HBox {
 
     }
 
+    private String secToString(int totalSecs){
+        int hours = totalSecs / 3600;
+        int minutes = (totalSecs % 3600) / 60;
+        int seconds = totalSecs % 60;
+
+        return String.format("%02d:%02d", minutes, seconds);
+    }
+
     private void setPlayMouseEvent(){
         playButton.setOnMousePressed(new EventHandler<MouseEvent>() {
             @Override
@@ -65,7 +74,7 @@ public class MSong extends HBox {
                     controller.setAudioPause();
                 } else {
                     setToPause();
-                    controller.changePlaySong(MSong.this);
+                    controller.changePlaySong(song, MSong.this);
                 }
             }
         });
@@ -100,9 +109,9 @@ public class MSong extends HBox {
         return artist;
     }
 
-    public ImageView getCoverImage() {
+    /*public ImageView getCoverImage() {
         return coverImage;
-    }
+    }*/
 
     public MSongLabel getSongName() {
         return songName;
@@ -131,6 +140,7 @@ public class MSong extends HBox {
                 Color.TRANSPARENT, Color.TRANSPARENT, BorderStrokeStyle.SOLID, BorderStrokeStyle.SOLID,
                 BorderStrokeStyle.SOLID, BorderStrokeStyle.SOLID, new CornerRadii(0.0), BorderStroke.THIN,
                 new Insets(0.0))));
+        this.setMaxHeight(30);
     }
 
     private void setSpacingAppearance(){

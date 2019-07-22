@@ -25,12 +25,12 @@ public class MArtistPage extends VBox {
     private Label artistName;
     private StackPane stackPane;
 
-    public MArtistPage(String coverImagePath, String profileImagePath, String artistName, double startWidth,
+    public MArtistPage(String artistName, double startWidth,
                        ArrayList<MAlbum> albums, ArrayList<MAlbum> singles, Scene scene){
         loadContent();
         this.getChildren().add(content);
         setImages();
-        loadImages(coverImagePath, profileImagePath);
+        loadImages();
         setImagesAppearance(startWidth);
         setArtistName();
         this.artistName.setText(artistName);
@@ -84,13 +84,13 @@ public class MArtistPage extends VBox {
         }
     }
 
-    private void loadImages(String coverImagePath, String profileImagePath){
+    private void loadImages(){
         coverImage.setImage(new Image(getClass().getResourceAsStream(".." + File.separator + ".." + File.separator +
                 ".." + File.separator + ".." + File.separator + "res" + File.separator +
-                "images" + File.separator + coverImagePath)));
+                "client" + File.separator + "images" + File.separator + "singleArtist" + File.separator + "cover.png")));
         profileImage.setImage(new Image(getClass().getResourceAsStream(".." + File.separator + ".." + File.separator +
                 ".." + File.separator + ".." + File.separator + "res" + File.separator +
-                "images" + File.separator + profileImagePath)));
+                "client" + File.separator + "images" + File.separator + "singleArtist" + File.separator + "profile.png")));
     }
 
     private void setImagesAppearance(double width){

@@ -1,19 +1,57 @@
 package musicary.controllers;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import musicary.graphics.components.*;
 import musicary.graphics.panes.*;
+import musicary.model.Artist;
+import musicary.model.Song;
+import musicary.model.client.RequestManager;
 
+import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
+import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class MainController {
+
+    public static final int TYPE_GENRE = 0;
+    public static final int TYPE_CHART = 1;
+    public static final int TYPE_ARTIST = 2;
+
+    private Image playImage;
+    private Image playerPlayImage;
+    private Image playerPauseImage;
+    private Image pauseImage;
+    private Scene scene;
+    private MSong inPlay;
+    private Song playingSong;
+    private boolean isPlaying = false;
+    private Scene loginScene;
+    private Stage stage;
+    public static final int ARTIST = 1;
+    public static final int SONGS = 2;
+    private RequestManager requestManager;
+    private ArrayList<MSong> currentTracklist;
+    private ArrayList<MSong> requestedTrackList;
+    private Pane executingPane;
+    private Pane currentPane;
+    private String currentGenre;
+    private String executingGenre;
+    private int currentArtist;
+    private int executingArtist;
+    private int currentPaneType;
+    private int executingPaneType;
+
 
     @FXML
     private MMainSection mainSection;
@@ -35,19 +73,12 @@ public class MainController {
     private ImageView backAudioButton;
     @FXML
     private MMenuProfileButton profileHomeButton;
-
-
-    private Image playImage;
-    private Image playerPlayImage;
-    private Image playerPauseImage;
-    private Image pauseImage;
-    private Scene scene;
-    private MSong inPlay;
-    private boolean isPlaying = false;
-    private Scene loginScene;
-    private Stage stage;
-    public static final int ARTIST = 1;
-    public static final int SONGS = 2;
+    @FXML
+    private MProgressBar progressBar;
+    @FXML
+    private Label actualSongTime;
+    @FXML
+    private Label endSongTime;
 
 
     @FXML
@@ -62,43 +93,34 @@ public class MainController {
         genres.add(new MGenresButton("Indie", "indie.png", this));
         genres.add(new MGenresButton("EDM", "edm.png", this));
         genres.add(new MGenresButton("Pop", "pop.png", this));
-        genres.add(new MGenresButton("Rock", "rock.png", this));
-        genres.add(new MGenresButton("Indie", "indie.png", this));
-        genres.add(new MGenresButton("EDM", "edm.png", this));
-        genres.add(new MGenresButton("Pop", "pop.png", this));
-        genres.add(new MGenresButton("Rock", "rock.png", this));
-        genres.add(new MGenresButton("Indie", "indie.png", this));
-        genres.add(new MGenresButton("EDM", "edm.png", this));
-        genres.add(new MGenresButton("Pop", "pop.png", this));
+        genres.add(new MGenresButton("Hip Pop", "hiphop.png", this));
+        genres.add(new MGenresButton("Metal", "metal.png", this));
         mainSection.loadSection(new MGenresGrid(genres));
     }
 
     @FXML
     private void loadCharts(MouseEvent mouseEvent) {
 
-        ArrayList<MSong> songs = new ArrayList<>();
-        ImageView songCoverImage = new ImageView(new Image(getClass().getResourceAsStream(".." +
-                File.separator + ".." + File.separator + ".." + File.separator + "res"
-                + File.separator + "images" + File.separator +
-                "cover2.jpg"), 128.0, 128.0,true, ImageView.SMOOTH_DEFAULT));
+        if(executingPaneType == TYPE_CHART) {
+            mainSection.loadSection(executingPane);
+        } else {
 
-        ImageView songCoverImage2 = new ImageView(new Image(getClass().getResourceAsStream(".." +
-                File.separator + ".." + File.separator + ".." + File.separator + "res" + File.separator +
-                "images" + File.separator +
-                "cover.jpg"), 128.0, 128.0,true, ImageView.SMOOTH_DEFAULT));
+            requestedTrackList = new ArrayList<>();
 
-        for (int i = 0; i < 10; i++) {
-            if(i % 2 == 0){
-                songs.add(new MSong(Integer.toString(i + 1), playImage, pauseImage, songCoverImage,"Dani California", "Red Hot Chili Peppers",
-                        "Stadium Arcadium", "03:15", 120000, this));
-            } else {
-                songs.add(new MSong(Integer.toString(i + 1), playImage, pauseImage,songCoverImage2, "Hysteria", "Muse",
-                        "Apocalypse", "02:15", 120000, this));
+            try {
+                ArrayList<Song> songs = requestManager.getGlobalChart();
+                for (int i = 0; i < songs.size(); i++) {
+                    requestedTrackList.add(new MSong(songs.get(i), playImage, pauseImage, this));
+                }
+            } catch (IOException | ClassNotFoundException e) {
+                e.printStackTrace();
             }
-        }
 
-        mainSection.loadSection(new MChart(songs, "Le canzoni più ascoltate del momento", "rock.jpg",
-                mainSection.getWidth(), scene));
+            currentPaneType = TYPE_CHART;
+            currentPane = new MChart(requestedTrackList, "Le canzoni più ascoltate del momento", "chart.jpg",
+                    mainSection.getWidth(), scene);
+            mainSection.loadSection(currentPane);
+        }
     }
 
     @FXML
@@ -138,7 +160,7 @@ public class MainController {
                 "components" + File.separator + "images" + File.separator +
                 "pause.png"));
 
-        ArrayList<MArtistButton> artists = new ArrayList<>();
+        /*ArrayList<MArtistButton> artists = new ArrayList<>();
         ArrayList<MArtistButton> artists2 = new ArrayList<>();
 
         for (int i = 0; i < 10; i++) {
@@ -155,24 +177,68 @@ public class MainController {
                 artists2.add(new MArtistButton("Muse", "redhot.jpg", this));
         }
 
-        mainSection.loadSection(new MHomePage(artists, artists2));
+        mainSection.loadSection(new MHomePage(artists, artists2));*/
+        loadGenre("rock");
     }
 
     public void loadGenre(String genre){
-        mainSection.loadSection(new MGenreChoose(genre, "Rock",this));
+        mainSection.loadSection(new MGenreChoose(genre, genre,this));
     }
 
-    public void changePlaySong(MSong song){
+    public void setRequestManager(RequestManager requestManager) {
+        this.requestManager = requestManager;
+        this.requestManager.setController(this);
+    }
 
-        if(inPlay != song){
-            if(inPlay != null)
-                inPlay.setToPlay();
+    private void requestSong(Song song, boolean canIStream){
+        try {
+            requestManager.getSong(song, canIStream);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (UnsupportedAudioFileException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
-            playingAudioAlbum.setText(song.getSongName().getText());
-            playingAudioArtist.setText(song.getArtist().getText());
-            playingAudioPicture.setImage(song.getCoverImage().getImage());
-            inPlay = song;
-            setAudioPlay();
+    public void setPlayingSongImage(){
+        playingAudioPicture.setImage(new Image(getClass().getResourceAsStream( ".." +
+                File.separator + ".." + File.separator + ".." + File.separator + "res" + File.separator +
+                "client" + File.separator + "images" + File.separator +
+                "album" + File.separator + "image.png"), 100.0, 100.0,true,
+                ImageView.SMOOTH_DEFAULT));
+    }
+
+    public void changePlaySong(Song song, MSong msong){
+
+        if(currentTracklist != requestedTrackList) {
+            currentTracklist = requestedTrackList;
+            executingPane = currentPane;
+            executingGenre = currentGenre;
+            executingPaneType = currentPaneType;
+            executingArtist = currentArtist;
+            playingAudioAlbum.setText(song.getTitle());
+            playingAudioArtist.setText(song.getArtist());
+        }
+
+        try {
+            requestManager.sendRequest("getSong");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        if(playingSong != song){
+
+            setAudioPause();
+
+            inPlay = msong;
+            playingSong = song;
+            setAudioPlay(song, true);
+
+        } else {
+
+            setAudioPlay(song, false);
         }
 
     }
@@ -189,14 +255,41 @@ public class MainController {
         this.loginScene = loginScene;
     }
 
+    public void incrementPBarSecond(double percentage){
+        progressBar.setSeconds(percentage);
+    }
+
+    public void setCurrentSongTime(String value){
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                actualSongTime.setText(value);
+            }
+        });
+    }
+
+    public void setEndSongTime(String value){
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                endSongTime.setText(value);
+            }
+        });
+    }
+
     public void setAudioPause(){
         isPlaying = false;
         playAudioButton.setImage(playerPlayImage);
+
+        if(playingSong != null)
+            requestManager.Pause();
+
         if(inPlay != null)
             inPlay.setToPlay();
     }
 
-    public void setAudioPlay(){
+    public void setAudioPlay(Song song, boolean canIStream){
+        requestSong(song, canIStream);
         isPlaying = true;
         playAudioButton.setImage(playerPauseImage);
         if(inPlay != null)
@@ -204,106 +297,172 @@ public class MainController {
     }
 
     @FXML
-    private void playOrPauseClick(MouseEvent mouseEvent) {
-        if(isPlaying)
-            setAudioPause();
-        else
-            setAudioPlay();
+    private void playNextAudio(MouseEvent mouseEvent) {
+        if(playingSong != null) {
+            try {
+                if(playingSong.getTracklistIndex() + 1 <= requestManager.getCurrentTrackList().size() - 1) {
+                    System.out.println(playingSong.getTitle());
+                    System.out.println(requestManager.getCurrentTrackList().size());
+                    setAudioPause();
+                    requestManager.sendRequest("getSong");
+                    inPlay = currentTracklist.get(playingSong.getTracklistIndex() + 1);
+                    setAudioPlay(requestManager.getCurrentTrackList().get(playingSong.getTracklistIndex() + 1), true);
+                    playingSong = requestManager.getCurrentTrackList().get(playingSong.getTracklistIndex() + 1);
+                } else {
+                    System.out.println(playingSong.getTitle());
+                    System.out.println(requestManager.getCurrentTrackList().size());
+                    setAudioPause();
+                    requestManager.sendRequest("getSong");
+                    inPlay = currentTracklist.get(0);
+                    setAudioPlay(requestManager.getCurrentTrackList().get(0), true);
+                    playingSong = requestManager.getCurrentTrackList().get(0);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
-    public void loadArtist(String artist){
-        ArrayList<MSong> songs = new ArrayList<>();
-        ArrayList<MSong> songs2 = new ArrayList<>();
-        ArrayList<MAlbum> albums = new ArrayList<>();
-        ArrayList<MAlbum> singles = new ArrayList<>();
-        ArrayList<MSong> ssongs = new ArrayList<>();
-        ArrayList<MSong> ssongs2 = new ArrayList<>();
-        ImageView songCoverImage = new ImageView(new Image(getClass().getResourceAsStream(".." +
-                File.separator + ".." + File.separator + ".." + File.separator + "res" + File.separator + "images" + File.separator +
-                "cover2.jpg"), 128.0, 128.0,true, ImageView.SMOOTH_DEFAULT));
-
-        ImageView songCoverImage2 = new ImageView(new Image(getClass().getResourceAsStream(".." +
-                File.separator + ".." + File.separator + ".." + File.separator + "res" + File.separator + "images"
-                + File.separator +
-                "cover.jpg"), 128.0, 128.0,true, ImageView.SMOOTH_DEFAULT));
-
-
-        for (int i = 0; i < 10; i++) {
-            if(i % 2 == 0){
-                songs.add(new MSong("-", playImage, pauseImage,songCoverImage, "Dani California", "Red Hot Chili Peppers",
-                        "Stadium Arcadium", "03:15", 120000, this));
-            } else {
-                songs.add(new MSong("-", playImage, pauseImage,songCoverImage2,"Hysteria", "Muse",
-                        "Apocalypse", "02:15", 120000, this));
+    @FXML
+    private void playPreviousAudio(MouseEvent mouseEvent) {
+        if(playingSong != null) {
+            try {
+                if(playingSong.getTracklistIndex() - 1 >= 0) {
+                    setAudioPause();
+                    requestManager.sendRequest("getSong");
+                    inPlay = currentTracklist.get(playingSong.getTracklistIndex() - 1);
+                    setAudioPlay(requestManager.getCurrentTrackList().get(playingSong.getTracklistIndex() - 1), true);
+                    playingSong = requestManager.getCurrentTrackList().get(playingSong.getTracklistIndex() - 1);
+                } else {
+                    setAudioPause();
+                    requestManager.sendRequest("getSong");
+                    inPlay = currentTracklist.get(requestManager.getCurrentTrackList().size() - 1);
+                    setAudioPlay(requestManager.getCurrentTrackList().get(requestManager.getCurrentTrackList().size()
+                            - 1), true);
+                    playingSong = requestManager.getCurrentTrackList().get(requestManager.getCurrentTrackList().size()
+                            - 1);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
+    }
 
-        for (int i = 0; i < 10; i++) {
-            if(i % 2 == 0){
-                songs2.add(new MSong("-", playImage, pauseImage,songCoverImage, "Dani California", "Red Hot Chili Peppers",
-                        "Stadium Arcadium", "03:15", 120000, this));
-            } else {
-                songs2.add(new MSong("-", playImage, pauseImage, songCoverImage2, "Hysteria", "Muse",
-                        "Apocalypse", "02:15", 120000, this));
-            }
+    @FXML
+    private void playOrPauseClick(MouseEvent mouseEvent) {
+        if(playingSong != null) {
+            if (isPlaying)
+                setAudioPause();
+            else
+                setAudioPlay(playingSong, false);
         }
+    }
 
-        ssongs.add(new MSong("-", playImage, pauseImage, songCoverImage, "Fortune Faded", "Red Hot Chili Peppers", "Fortune Faded",
-                "03:15", 120000, this));
-        ssongs2.add(new MSong("-", playImage, pauseImage, songCoverImage2, "Fortune Faded", "Red Hot Chili Peppers", "Fortune Faded",
-                "03:15", 120000, this));
-        albums.add(new MAlbum("Stadium Aracadium", 2006, songs));
-        albums.add(new MAlbum("By The Way", 2002, songs2));
-        singles.add(new MAlbum("Fortune Faded", 2004, ssongs));
-        singles.add(new MAlbum("Fortune Faded", 2004, ssongs2));
+    public void loadArtist(String artistId, String artistName){
+        try {
 
-        mainSection.loadSection(new MArtistPage("rhcp.jpg", "redhot.jpg",
-                "Red Hot Chili Peppers", mainSection.getWidth(), albums, singles, scene));
+            if(executingPaneType == TYPE_ARTIST && executingArtist == Integer.parseInt(artistId)){
+                mainSection.loadSection(executingPane);
+            } else {
+                requestManager.getArtistImages(artistId);
+                ArrayList<ArrayList<Song>> albums = requestManager.getArtistAlbums(artistId);
+                ArrayList<ArrayList<Song>> singles = requestManager.getArtistSingles(artistId);
+                ArrayList<MAlbum> mAlbums = new ArrayList<>();
+                ArrayList<MAlbum> mSingles = new ArrayList<>();
+                requestedTrackList = new ArrayList<>();
+                for (int i = 0; i < albums.size(); i++) {
+                    ArrayList<MSong> songs = new ArrayList<>();
+
+                    for (int j = 0; j < albums.get(i).size(); j++) {
+                        songs.add(new MSong(albums.get(i).get(j), playImage, pauseImage, this));
+                    }
+
+                    for (int j = 0; j < songs.size(); j++) {
+                        requestedTrackList.add(songs.get(j));
+                    }
+
+                    mAlbums.add(new MAlbum(albums.get(i).get(0).getAlbum(),
+                            albums.get(i).get(0).getYearReleaseDate(), songs));
+                }
+
+                for (int i = 0; i < singles.size(); i++) {
+                    ArrayList<MSong> songs = new ArrayList<>();
+
+                    for (int j = 0; j < singles.get(i).size(); j++) {
+                        songs.add(new MSong(singles.get(i).get(j), playImage, pauseImage, this));
+                    }
+
+                    for (int j = 0; j < songs.size(); j++) {
+                        requestedTrackList.add(songs.get(j));
+                    }
+
+                    mSingles.add(new MAlbum(singles.get(i).get(1).getAlbum(),
+                            singles.get(i).get(1).getYearReleaseDate(), songs));
+                }
+
+                currentPaneType = TYPE_ARTIST;
+                currentArtist = Integer.parseInt(artistId);
+                currentPane = new MArtistPage(artistName, mainSection.getWidth(),
+                        mAlbums, mSingles, scene);
+                mainSection.loadSection(currentPane);
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     public void loadGenreChoose(int genreChoose, String genre){
-        ArrayList<MSong> songs = new ArrayList<>();
-        ArrayList<MArtistButton> artists = new ArrayList<>();
 
-        ImageView songCoverImage = new ImageView(new Image(getClass().getResourceAsStream(".." +
-                File.separator + ".." + File.separator + ".." + File.separator + "res" + File.separator +
-                "images" + File.separator +
-                "cover2.jpg"), 128.0, 128.0,true, ImageView.SMOOTH_DEFAULT));
 
-        ImageView songCoverImage2 = new ImageView(new Image(getClass().getResourceAsStream(".." +
-                File.separator + ".." + File.separator + ".." + File.separator + "res" + File.separator +
-                "images" + File.separator +
-                "cover.jpg"), 128.0, 128.0,true, ImageView.SMOOTH_DEFAULT));
-        
-        for (int i = 0; i < 10; i++) {
-            if(i % 2 == 0){
-                songs.add(new MSong("-", playImage, pauseImage,songCoverImage,
-                        "Dani California", "Red Hot Chili Peppers",
-                        "Stadium Arcadium", "03:15", 120000, this));
+        if(genreChoose == ARTIST){
+            try {
+                ArrayList<MArtistButton> artistButtons = new ArrayList<>();
+                ArrayList<Artist> artists = requestManager.getArtistsList(genre);
+                for (int i = 0; i < artists.size(); i++) {
+                    artistButtons.add(new MArtistButton(artists.get(i).getNome(), artists.get(i).getId() + ".png"
+                    , artists.get(i).getId(), this));
+                }
+
+                mainSection.loadSection(new MArtistsGrid(artistButtons));
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+
+
+        } else if(genreChoose == SONGS){
+            if(executingPaneType == TYPE_GENRE && genre.equals(executingGenre)) {
+                mainSection.loadSection(executingPane);
             } else {
-                songs.add(new MSong("-", playImage, pauseImage,songCoverImage2,
-                        "Hysteria", "Muse",
-                        "Apocalypse", "02:15", 120000, this));
+
+                requestedTrackList = new ArrayList<>();
+
+                try {
+                    ArrayList<Song> songs = requestManager.getTrackListForGenre(genre);
+                    for (int i = 0; i < songs.size(); i++) {
+                        requestedTrackList.add(new MSong(songs.get(i), playImage, pauseImage, this));
+                    }
+                } catch (IOException | ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
+
+                currentPaneType = TYPE_GENRE;
+                currentGenre = genre;
+                currentPane = new MGenreSongsList(requestedTrackList, "Brani " + genre + " in evidenza", "popcover.jpg",
+                        mainSection.getWidth(), scene);
+                mainSection.loadSection(currentPane);
             }
         }
-
-        for (int i = 0; i < 10; i++) {
-            if(i % 2 == 0)
-                artists.add(new MArtistButton("Red Hot Chili Peppers", "redhot.jpg", this));
-            else
-                artists.add(new MArtistButton("Muse", "redhot.jpg", this));
-        }
-
-        if(genreChoose == ARTIST)
-            mainSection.loadSection(new MArtistsGrid(artists));
-        else if(genreChoose == SONGS)
-            mainSection.loadSection(new MGenreSongsList(songs, "Brani Rock in eveidenza", "rock.jpg",
-                    mainSection.getWidth(), scene));
     }
 
     @FXML
     private void redirectArtist(MouseEvent mouseEvent) {
-        ArrayList<MSong> songs = new ArrayList<>();
+        /*ArrayList<MSong> songs = new ArrayList<>();
         ArrayList<MSong> songs2 = new ArrayList<>();
         ArrayList<MAlbum> albums = new ArrayList<>();
         ArrayList<MAlbum> singles = new ArrayList<>();
@@ -321,7 +480,8 @@ public class MainController {
 
         for (int i = 0; i < 10; i++) {
             if(i % 2 == 0){
-                songs.add(new MSong("-", playImage, pauseImage,songCoverImage, "Dani California", "Red Hot Chili Peppers",
+                songs.add(new MSong("-", playImage, pauseImage,songCoverImage, "Dani California",
+                        "Red Hot Chili Peppers",
                         "Stadium Arcadium", "03:15", 120000, this));
             } else {
                 songs.add(new MSong("-", playImage, pauseImage,songCoverImage2,"Hysteria", "Muse",
@@ -349,6 +509,6 @@ public class MainController {
         singles.add(new MAlbum("Fortune Faded", 2004, ssongs2));
 
         mainSection.loadSection(new MArtistPage("rhcp.jpg", "redhot.jpg",
-                "Red Hot Chili Peppers", mainSection.getWidth(), albums, singles, scene));
+                "Red Hot Chili Peppers", mainSection.getWidth(), albums, singles, scene));*/
     }
 }

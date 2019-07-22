@@ -22,26 +22,29 @@ public class MArtistButton extends BorderPane {
     private ImageView image;
     private MArtistsGridText label;
     private MainController controller;
+    private int artistId;
 
-    public MArtistButton (String text, String imagePath, MainController controller){
+    public MArtistButton (String text, String imagePath, int artistId, MainController controller){
+        this.artistId = artistId;
         this.controller = controller;
         label = new MArtistsGridText(text);
         image = new ImageView((new Image(getClass().getResourceAsStream(".." + File.separator + ".." + File.separator +
-                ".." + File.separator + ".." + File.separator + "res" + File.separator +
-                "images" + File.separator + imagePath),
+                ".." + File.separator + ".." + File.separator + "res" + File.separator + "client" + File.separator +
+                "images" + File.separator + "artists" + File.separator + imagePath),
                 128.0, 128.0, true, ImageView.SMOOTH_DEFAULT)));
-        this.setBottom(label);
-        this.setTop(image);
         setAppearance();
         setImageAppearance();
         setMouseEvents();
+        this.setBottom(label);
+        this.setTop(image);
     }
 
     private void setMouseEvents(){
         this.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                controller.loadArtist(label.getText());
+                controller.loadArtist(Integer.toString(artistId),
+                        label.getText());
             }
         });
 

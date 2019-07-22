@@ -25,7 +25,7 @@ public class MGenresButton extends BorderPane {
 
     public MGenresButton(String text, String imagePath, MainController controller) {
         this.controller = controller;
-        this.genre = text.toLowerCase();
+        this.genre = text;
         label = new MHomeText(text);
         image = new ImageView((new Image(getClass().getResourceAsStream(".." + File.separator + ".." + File.separator +
                 ".." + File.separator + ".." + File.separator + "res" + File.separator +  "components" + File.separator +

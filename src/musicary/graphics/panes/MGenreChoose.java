@@ -21,7 +21,7 @@ public class MGenreChoose extends BorderPane {
         this.controller = controller;
         this.genre = genre;
         this.bricks = new HBox();
-        title = new Label("Cosa vuoi scoprire riguardo al genere " + text + "?");
+        title = new Label("Cosa vuoi scoprire riguardo al genere " + text + " ?");
         setBricks();
         setTitleAppearance();
         setBricksAppearance();

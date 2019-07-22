@@ -49,7 +49,23 @@
                                     <VBox.margin>
                                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                     </VBox.margin></Label>
-                                <MTextWhiteField fx:id="artistNameSelected" maxWidth="300" />
+                                <MTextWhiteField fx:id="genreNameSelected" maxWidth="300" />
+                                <Label text="Carica miniatura del genere (ris: 256x256)" textFill="#ff004e">
+                                    <VBox.margin>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                    </VBox.margin></Label>
+                                <MButtonVariant onMouseClicked="#loadGenreImage" text="Carica file">
+                                    <VBox.margin>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                    </VBox.margin></MButtonVariant>
+                                <Label text="Carica la cover del genere (ris: 1600x352)" textFill="#ff004e">
+                                    <VBox.margin>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                    </VBox.margin></Label>
+                                <MButtonVariant onMouseClicked="#loadGenreCover" text="Carica file">
+                                    <VBox.margin>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                    </VBox.margin></MButtonVariant>
                                 <MButtonVariant onMouseClicked="#checkEditGenre" text="Invia">
                                     <VBox.margin>
                                         <Insets bottom="10.0" top="30.0" />
@@ -81,7 +97,23 @@
                                 <VBox.margin>
                                     <Insets bottom="10.0" left="10.0" right="10.0" top="56.0" />
                                 </VBox.margin></Label>
-                            <MTextWhiteField fx:id="artistName" maxWidth="300" />
+                            <MTextWhiteField fx:id="genreName" maxWidth="300" />
+                            <Label text="Carica miniatura del genere (ris: 256x256)" textFill="#ff004e">
+                                <VBox.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                </VBox.margin></Label>
+                            <MButtonVariant onMouseClicked="#loadNewGenreImage" text="Carica file">
+                                <VBox.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                </VBox.margin></MButtonVariant>
+                            <Label text="Carica la cover del genere (ris: 1600x352)" textFill="#ff004e">
+                                <VBox.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                </VBox.margin></Label>
+                            <MButtonVariant onMouseClicked="#loadNewGenreCover" text="Carica file">
+                                <VBox.margin>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                </VBox.margin></MButtonVariant>
                             <MButtonVariant onMouseClicked="#checkNewGenre" text="Invia">
                                 <VBox.margin>
                                     <Insets bottom="10.0" top="30.0" />

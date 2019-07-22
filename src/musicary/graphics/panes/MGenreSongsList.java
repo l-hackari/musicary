@@ -36,6 +36,7 @@ public class MGenreSongsList extends VBox {
         loadPlayImage("play.png");
         setTitleAppearance();
         setCoverImageAppearance(startWidth);
+        createMainSectionResizeListener(scene);
         header.setCenter(coverImage);
         header.setBottom(this.title);
         this.getChildren().add(header);

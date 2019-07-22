@@ -29,6 +29,7 @@ public class SigninController {
         mainBorderPane.setPrefWidth(borderPane.getWidth());
         mainBorderPane.setPrefHeight(borderPane.getHeight());
         stage.setScene(mainScene);
+        stage.setMaximized(true);
     }
 
     public void setStage(Stage stage) {
