@@ -308,6 +308,8 @@ public class MainController {
                     inPlay = currentTracklist.get(playingSong.getTracklistIndex() + 1);
                     setAudioPlay(requestManager.getCurrentTrackList().get(playingSong.getTracklistIndex() + 1), true);
                     playingSong = requestManager.getCurrentTrackList().get(playingSong.getTracklistIndex() + 1);
+                    playingAudioAlbum.setText(playingSong.getTitle());
+                    playingAudioArtist.setText(playingSong.getArtist());
                 } else {
                     System.out.println(playingSong.getTitle());
                     System.out.println(requestManager.getCurrentTrackList().size());
@@ -316,6 +318,8 @@ public class MainController {
                     inPlay = currentTracklist.get(0);
                     setAudioPlay(requestManager.getCurrentTrackList().get(0), true);
                     playingSong = requestManager.getCurrentTrackList().get(0);
+                    playingAudioAlbum.setText(playingSong.getTitle());
+                    playingAudioArtist.setText(playingSong.getArtist());
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -333,6 +337,8 @@ public class MainController {
                     inPlay = currentTracklist.get(playingSong.getTracklistIndex() - 1);
                     setAudioPlay(requestManager.getCurrentTrackList().get(playingSong.getTracklistIndex() - 1), true);
                     playingSong = requestManager.getCurrentTrackList().get(playingSong.getTracklistIndex() - 1);
+                    playingAudioAlbum.setText(playingSong.getTitle());
+                    playingAudioArtist.setText(playingSong.getArtist());
                 } else {
                     setAudioPause();
                     requestManager.sendRequest("getSong");
@@ -341,6 +347,8 @@ public class MainController {
                             - 1), true);
                     playingSong = requestManager.getCurrentTrackList().get(requestManager.getCurrentTrackList().size()
                             - 1);
+                    playingAudioAlbum.setText(playingSong.getTitle());
+                    playingAudioArtist.setText(playingSong.getArtist());
                 }
             } catch (IOException e) {
                 e.printStackTrace();
