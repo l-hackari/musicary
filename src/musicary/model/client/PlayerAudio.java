@@ -16,7 +16,7 @@ public class PlayerAudio {
 
     private AdvancedPlayer player = null;
 
-    private boolean inEsecuzione = false;
+    private boolean inPlay = false;
     private boolean timerIsRunning = false;
     private Integer second = 0;
 
@@ -54,18 +54,18 @@ public class PlayerAudio {
 
             @Override
             public void playbackFinished(PlaybackEvent event) {
-                inEsecuzione = false;
+                inPlay = false;
                 System.out.println("terminata");
             }
 
             @Override
             public void playbackStarted(PlaybackEvent event) {
                 controller.setEndSongTime(secToString(song.getDuration()));
-                inEsecuzione = true;
+                inPlay = true;
                 System.out.println("iniziata");
             }
         });
-        return inEsecuzione;
+        return inPlay;
     }
 
 
@@ -95,7 +95,9 @@ public class PlayerAudio {
             @Override
             public void run() {
                 try {
-
+                    while(inPlay){
+                        //sleep
+                    }
                     player = new AdvancedPlayer(song.getAudioInput());
 
                     if (!isRunning()) {
@@ -135,6 +137,10 @@ public class PlayerAudio {
         });
 
         t2.start();
+    }
+
+    public boolean isPlaying(){
+        return inPlay;
     }
 
     public int getEnd() {

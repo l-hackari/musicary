@@ -4,6 +4,7 @@ import musicary.controllers.MainController;
 import musicary.model.Artist;
 import musicary.model.Song;
 import musicary.model.User;
+import musicary.model.Genre;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.*;
@@ -110,6 +111,17 @@ public class RequestManager implements Runnable {
         return artistsList;
     }
 
+    public ArrayList<Genre> getGenres() throws IOException, ClassNotFoundException {
+        sendRequest("getGenres");
+        ArrayList<Genre> genres = (ArrayList<Genre>)objectIn.readObject();
+        for (int i = 0; i < genres.size(); i++) {
+            sendRequest("getGenresImages");
+            getGenreImages(Integer.toString((genres.get(i).getId())));
+        }
+
+        return genres;
+    }
+
 
     public ArrayList<Song> getTrackListForGenre(String genre) throws IOException, ClassNotFoundException {
         sendRequest("getforGenre");
@@ -137,13 +149,7 @@ public class RequestManager implements Runnable {
         Thread playBack = new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
-                    Thread.sleep(1000);
-                    player.play();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-
+                player.play();
             }
 
         });
@@ -198,6 +204,35 @@ public class RequestManager implements Runnable {
         }
     }
 
+    public void getGenreImages(String genreId){
+        try {
+            sendRequest(genreId);
+            URI uri = new URI(getClass().getResource(".." + File.separator + ".." + File.separator +
+                    ".." + File.separator + ".." + File.separator + "res" + File.separator + "client" +
+                    File.separator + "images" + File.separator + "genres" + File.separator + "mins" + File.separator
+                    + "image.png").toString());
+            String path = uri.getPath().substring(0, uri.getPath().length() - 9);
+            path += genreId + ".png";
+            getImage(path);
+
+            sendRequest("nextImage");
+
+            uri = new URI(getClass().getResource(".." + File.separator + ".." + File.separator +
+                    ".." + File.separator + ".." + File.separator + "res" + File.separator + "client" +
+                    File.separator + "images" + File.separator + "genres" + File.separator + "covers" + File.separator
+                    + "image.png").toString());
+
+            path = uri.getPath().substring(0, uri.getPath().length() - 9);
+            path += genreId + ".png";
+            getImage(path);
+
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void getArtistImages(String artistId){
         try {
             sendRequest("getArtistImages");
@@ -210,7 +245,6 @@ public class RequestManager implements Runnable {
             getImage(uri.getPath());
 
             sendRequest("nextImage");
-
             uri = new URI(getClass().getResource(".." + File.separator + ".." + File.separator +
                     ".." + File.separator + ".." + File.separator + "res" + File.separator + "client" +
                     File.separator + "images" + File.separator + "singleArtist" + File.separator
@@ -235,8 +269,9 @@ public class RequestManager implements Runnable {
             int count;
             while((count = in.read(bytes)) > 0){
                 fos.write(bytes, 0, count);
-                if(count < 1024)
+                if(count < 1024){
                     break;
+                }
             }
 
             fos.flush();
@@ -284,7 +319,7 @@ public class RequestManager implements Runnable {
 
                         player = new PlayerAudio(songToStream);
                         player.setController(controller);
-                        PlayBack();
+                        boolean play = false;
 
                         File songToStream = new File(uri.getPath());
                         FileOutputStream fos = new FileOutputStream(songToStream);
@@ -293,13 +328,22 @@ public class RequestManager implements Runnable {
                             fos.write(bytes, 0, count);
                             if(count < 1024*16)
                                 break;
+                            if(!play){
+                                PlayBack();
+                                play = true;
+                            }
                         }
 
                         fos.flush();
+                        fos.close();
 
 
                     } else {
                         System.out.println("canzone gia riprodotta quindi non la scarico ");
+                        while(player.isPlaying()) {
+                            //sleep
+                        }
+                        
                         PlayBack();
                     }
 

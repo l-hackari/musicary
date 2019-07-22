@@ -22,14 +22,16 @@ public class MGenresButton extends BorderPane {
     private MHomeText label;
     private String genre;
     protected MainController controller;
+    private String genreId;
 
-    public MGenresButton(String text, String imagePath, MainController controller) {
+    public MGenresButton(String text, String genreId, MainController controller) {
         this.controller = controller;
         this.genre = text;
+        this.genreId = genreId;
         label = new MHomeText(text);
         image = new ImageView((new Image(getClass().getResourceAsStream(".." + File.separator + ".." + File.separator +
-                ".." + File.separator + ".." + File.separator + "res" + File.separator +  "components" + File.separator +
-                "images" + File.separator + imagePath),
+                ".." + File.separator + ".." + File.separator + "res" + File.separator +  "client" + File.separator +
+                "images" + File.separator + "genres" + File.separator + "mins" + File.separator + genreId + ".png"),
                 128.0, 128.0, true, ImageView.SMOOTH_DEFAULT)));
         this.setBottom(label);
         this.setTop(image);
@@ -70,7 +72,7 @@ public class MGenresButton extends BorderPane {
         this.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-                controller.loadGenre(genre);
+                controller.loadGenre(genre, genreId);
             }
         });
     }

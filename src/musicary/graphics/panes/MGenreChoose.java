@@ -13,15 +13,17 @@ import musicary.controllers.MainController;
 public class MGenreChoose extends BorderPane {
 
     private Label title;
-    private String genre;
+    private String genreId;
     private HBox bricks;
+    private String genreText;
     private MainController controller;
 
-    public MGenreChoose(String genre, String text, MainController controller){
+    public MGenreChoose(String genreId, String genreText, MainController controller){
         this.controller = controller;
-        this.genre = genre;
+        this.genreId = genreId;
         this.bricks = new HBox();
-        title = new Label("Cosa vuoi scoprire riguardo al genere " + text + " ?");
+        this.genreText = genreText;
+        title = new Label("Cosa vuoi scoprire riguardo al genere " + genreText + " ?");
         setBricks();
         setTitleAppearance();
         setBricksAppearance();
@@ -32,10 +34,10 @@ public class MGenreChoose extends BorderPane {
     }
 
     private void setBricks(){
-        bricks.getChildren().add(new MGenreChooseButton("Artisti", "rock.png", controller,
-                MGenreChooseButton.ARTIST, genre));
-        bricks.getChildren().add(new MGenreChooseButton("Brani", "rock.png", controller,
-                MGenreChooseButton.SONGS, genre));
+        bricks.getChildren().add(new MGenreChooseButton("Artisti", controller,
+                MGenreChooseButton.ARTIST, genreText, genreId));
+        bricks.getChildren().add(new MGenreChooseButton("Brani", controller,
+                MGenreChooseButton.SONGS, genreText, genreId));
     }
 
     private void setBricksAppearance(){

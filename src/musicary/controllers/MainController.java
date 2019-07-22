@@ -15,11 +15,11 @@ import musicary.graphics.panes.*;
 import musicary.model.Artist;
 import musicary.model.Song;
 import musicary.model.client.RequestManager;
+import musicary.model.Genre;
 
 import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class MainController {
@@ -88,14 +88,21 @@ public class MainController {
 
     @FXML
     private void loadGenres(MouseEvent mouseEvent) {
-        ArrayList<MGenresButton> genres = new ArrayList<>();
-        genres.add(new MGenresButton("Rock", "rock.png", this));
-        genres.add(new MGenresButton("Indie", "indie.png", this));
-        genres.add(new MGenresButton("EDM", "edm.png", this));
-        genres.add(new MGenresButton("Pop", "pop.png", this));
-        genres.add(new MGenresButton("Hip Pop", "hiphop.png", this));
-        genres.add(new MGenresButton("Metal", "metal.png", this));
-        mainSection.loadSection(new MGenresGrid(genres));
+
+        try {
+            ArrayList<Genre> genres = requestManager.getGenres();
+            ArrayList<MGenresButton> mgenres = new ArrayList<>();
+            for (int i = 0; i < genres.size(); i++) {
+                mgenres.add(new MGenresButton(genres.get(i).getName(), Integer.toString(genres.get(i).getId()),
+                        this));
+            }
+            mainSection.loadSection(new MGenresGrid(mgenres));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @FXML
@@ -178,11 +185,11 @@ public class MainController {
         }
 
         mainSection.loadSection(new MHomePage(artists, artists2));*/
-        loadGenre("rock");
+        loadProfilePage(null);
     }
 
-    public void loadGenre(String genre){
-        mainSection.loadSection(new MGenreChoose(genre, genre,this));
+    public void loadGenre(String text, String genreId){
+        mainSection.loadSection(new MGenreChoose(genreId, text,this));
     }
 
     public void setRequestManager(RequestManager requestManager) {
@@ -222,14 +229,14 @@ public class MainController {
             playingAudioArtist.setText(song.getArtist());
         }
 
-        try {
-            requestManager.sendRequest("getSong");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         if(playingSong != song){
 
+            try {
+                requestManager.sendRequest("getSong");
+                System.out.println("QUI");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             setAudioPause();
 
             inPlay = msong;
@@ -422,7 +429,7 @@ public class MainController {
         }
     }
 
-    public void loadGenreChoose(int genreChoose, String genre){
+    public void loadGenreChoose(int genreChoose, String genre, String genreId){
 
 
         if(genreChoose == ARTIST){
@@ -461,7 +468,7 @@ public class MainController {
 
                 currentPaneType = TYPE_GENRE;
                 currentGenre = genre;
-                currentPane = new MGenreSongsList(requestedTrackList, "Brani " + genre + " in evidenza", "popcover.jpg",
+                currentPane = new MGenreSongsList(requestedTrackList, "Brani " + genre + " in evidenza", genreId,
                         mainSection.getWidth(), scene);
                 mainSection.loadSection(currentPane);
             }

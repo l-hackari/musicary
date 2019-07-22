@@ -1,6 +1,7 @@
 package musicary.model.server;
 
 import musicary.model.Artist;
+import musicary.model.Genre;
 import musicary.model.Song;
 import musicary.model.User;
 
@@ -8,7 +9,6 @@ import java.io.*;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -63,7 +63,7 @@ public class ServiceManager implements Runnable {
                     ".." + File.separator + ".." + File.separator + "res" + File.separator + "server" +
                     File.separator + "images" + File.separator + "album" + File.separator + albumId +
                     ".png").toString());
-            sendImage(uri);
+            sendImage(uri.getPath());
         } catch (IOException e) {
             e.printStackTrace();
         } catch (URISyntaxException e) {
@@ -80,7 +80,7 @@ public class ServiceManager implements Runnable {
                     ".." + File.separator + ".." + File.separator + "res" + File.separator + "server" +
                     File.separator + "images" + File.separator + "artists" + File.separator + "profile" +
                     File.separator + artistId + ".png").toString());
-            sendImage(uri);
+            sendImage(uri.getPath());
         } catch (IOException e) {
             e.printStackTrace();
         } catch (URISyntaxException e) {
@@ -95,7 +95,7 @@ public class ServiceManager implements Runnable {
                     File.separator + "images" + File.separator + "artists" + File.separator + "profile" +
                     File.separator + artistId + ".png").toString());
 
-            sendImage(uri);
+            sendImage(uri.getPath());
 
             getRequest();
 
@@ -104,7 +104,7 @@ public class ServiceManager implements Runnable {
                     File.separator + "images" + File.separator + "artists" + File.separator + "cover" +
                     File.separator + artistId + ".png").toString());
 
-            sendImage(uri);
+            sendImage(uri.getPath());
         } catch (URISyntaxException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -112,10 +112,41 @@ public class ServiceManager implements Runnable {
         }
     }
 
-    public void sendImage(URI uri){
+    public void sendGenreImages(String genreId){
+        try {
+            System.out.println(genreId);
+            URI uri = new URI(getClass().getResource(".." + File.separator + ".." + File.separator +
+                    ".." + File.separator + ".." + File.separator + "res" + File.separator + "server" +
+                    File.separator + "images" + File.separator + "genres" + File.separator + "mins" + File.separator
+                    + "image.png").toString());
+
+            String path = uri.getPath().substring(0, uri.getPath().length() - 9);
+            path += genreId + ".png";
+            sendImage(path);
+
+            getRequest();
+
+            uri = new URI(getClass().getResource(".." + File.separator + ".." + File.separator +
+                    ".." + File.separator + ".." + File.separator + "res" + File.separator + "server" +
+                    File.separator + "images" + File.separator + "genres" + File.separator + "covers" + File.separator
+                    + "image.png").toString());
+
+            path = uri.getPath().substring(0, uri.getPath().length() - 9);
+            path += genreId + ".png";
+
+            sendImage(path);
+
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sendImage(String path){
 
         try {
-            File f = new File(uri.getPath());
+            File f = new File(path);
             FileInputStream file = new FileInputStream(f);
             byte [] bytes = new byte [(int) f.length()];
             file.read(bytes);
@@ -211,6 +242,24 @@ public class ServiceManager implements Runnable {
             }
 
         objectOut.writeObject(artists.clone());
+        objectOut.flush();
+
+    }
+
+    public void sendGenres() throws SQLException, IOException {
+
+        PreparedStatement statement = db.statement("SELECT id, nome_genere FROM genere");
+        ResultSet reslts = statement.executeQuery();
+        ArrayList<Genre> genres = new ArrayList<>();
+        while(reslts.next()){
+
+            Genre genre = new Genre();
+            genre.setId(reslts.getInt("id"));
+            genre.setName(reslts.getString("nome_genere"));
+            genres.add(genre);
+        }
+
+        objectOut.writeObject(genres);
         objectOut.flush();
 
     }
@@ -426,12 +475,8 @@ public class ServiceManager implements Runnable {
                     SignUp();
                 } else if(req.equals("getArtists")) {
                     sendArtistList(getRequest());
-                }
-
-                else if (req.equals("getforGenre")){
-
+                } else if (req.equals("getforGenre")){
                     sendTrackListForGenre(getRequest());
-
                 } else if(req.equals("getArtistProfileImage")){
                     sendArtistProfileImage();
                 } else if(req.equals("getArtistImages")) {
@@ -442,6 +487,10 @@ public class ServiceManager implements Runnable {
                     sendArtistSingles(getRequest());
                 } else if(req.equals("getGlobalChart")){
                     sendGlobalChart();
+                } else if(req.equals("getGenres")){
+                    sendGenres();
+                } else if(req.equals("getGenresImages")){
+                    sendGenreImages(getRequest());
                 }
             }
 

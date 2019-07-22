@@ -82,9 +82,8 @@ public class MGenreSongsList extends VBox {
     }
 
     private void loadCoverImage(String imagePath){
-        coverImage = new ImageView(new Image(getClass().getResourceAsStream(".." + File.separator + ".." +
-                File.separator +
-                ".." + File.separator + ".." + File.separator + "res" + File.separator +
-                "images" + File.separator + imagePath)));
+       coverImage = new ImageView(new Image(getClass().getResourceAsStream(".." + File.separator + ".." + File.separator +
+                ".." + File.separator + ".." + File.separator + "res" + File.separator +  "client" + File.separator +
+                "images" + File.separator + "genres" + File.separator + "covers" + File.separator + imagePath + ".png")));
     }
 }
