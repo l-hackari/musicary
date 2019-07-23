@@ -106,6 +106,8 @@ public class MainController {
                 File.separator + ".." + File.separator + ".." + File.separator + "res" + File.separator +
                 "components" + File.separator + "images" + File.separator +
                 "pause.png"));
+
+        progressBar.setMainController(this);
     }
 
     @FXML
@@ -234,11 +236,12 @@ public class MainController {
             executingGenre = currentGenre;
             executingPaneType = currentPaneType;
             executingArtist = currentArtist;
-            playingAudioAlbum.setText(song.getTitle());
-            playingAudioArtist.setText(song.getArtist());
         }
 
         if(playingSong != song){
+
+            playingAudioAlbum.setText(song.getTitle());
+            playingAudioArtist.setText(song.getArtist());
 
             try {
                 requestManager.sendRequest("getSong");
@@ -317,7 +320,7 @@ public class MainController {
     }
 
     @FXML
-    private void playNextAudio(MouseEvent mouseEvent) {
+    public void playNextAudio(MouseEvent mouseEvent) {
         if(playingSong != null) {
             try {
                 if(playingSong.getTracklistIndex() + 1 <= requestManager.getCurrentTrackList().size() - 1) {
@@ -383,6 +386,21 @@ public class MainController {
                 setAudioPause();
             else
                 setAudioPlay(playingSong, false);
+        }
+    }
+
+    public void changeSongProgress(double progress){
+
+        if(playingSong != null){
+            if(requestManager.isPlaying()) {
+                requestManager.Pause();
+                Double frame = requestManager.getPlayerSong().getDuration() * progress;
+                requestManager.setPausedOnframe((frame.intValue()) * 39);
+                requestManager.PlayBack();
+            }else {
+                Double frame = requestManager.getPlayerSong().getDuration() * progress;
+                requestManager.setPausedOnframe((frame.intValue()) * 39);
+            }
         }
     }
 
@@ -490,53 +508,6 @@ public class MainController {
 
     @FXML
     private void redirectArtist(MouseEvent mouseEvent) {
-        /*ArrayList<MSong> songs = new ArrayList<>();
-        ArrayList<MSong> songs2 = new ArrayList<>();
-        ArrayList<MAlbum> albums = new ArrayList<>();
-        ArrayList<MAlbum> singles = new ArrayList<>();
-        ArrayList<MSong> ssongs = new ArrayList<>();
-        ArrayList<MSong> ssongs2 = new ArrayList<>();
-        ImageView songCoverImage = new ImageView(new Image(getClass().getResourceAsStream(".." +
-                File.separator + ".." + File.separator + ".." + File.separator + "res" + File.separator + "images" + File.separator +
-                "cover2.jpg"), 128.0, 128.0,true, ImageView.SMOOTH_DEFAULT));
-
-        ImageView songCoverImage2 = new ImageView(new Image(getClass().getResourceAsStream(".." +
-                File.separator + ".." + File.separator + ".." + File.separator + "res" + File.separator + "images"
-                + File.separator +
-                "cover.jpg"), 128.0, 128.0,true, ImageView.SMOOTH_DEFAULT));
-
-
-        for (int i = 0; i < 10; i++) {
-            if(i % 2 == 0){
-                songs.add(new MSong("-", playImage, pauseImage,songCoverImage, "Dani California",
-                        "Red Hot Chili Peppers",
-                        "Stadium Arcadium", "03:15", 120000, this));
-            } else {
-                songs.add(new MSong("-", playImage, pauseImage,songCoverImage2,"Hysteria", "Muse",
-                        "Apocalypse", "02:15", 120000, this));
-            }
-        }
-
-        for (int i = 0; i < 10; i++) {
-            if(i % 2 == 0){
-                songs2.add(new MSong("-", playImage, pauseImage,songCoverImage, "Dani California", "Red Hot Chili Peppers",
-                        "Stadium Arcadium", "03:15", 120000, this));
-            } else {
-                songs2.add(new MSong("-", playImage, pauseImage, songCoverImage2, "Hysteria", "Muse",
-                        "Apocalypse", "02:15", 120000, this));
-            }
-        }
-
-        ssongs.add(new MSong("-", playImage, pauseImage, songCoverImage, "Fortune Faded", "Red Hot Chili Peppers", "Fortune Faded",
-                "03:15", 120000, this));
-        ssongs2.add(new MSong("-", playImage, pauseImage, songCoverImage2, "Fortune Faded", "Red Hot Chili Peppers", "Fortune Faded",
-                "03:15", 120000, this));
-        albums.add(new MAlbum("Stadium Aracadium", 2006, songs));
-        albums.add(new MAlbum("By The Way", 2002, songs2));
-        singles.add(new MAlbum("Fortune Faded", 2004, ssongs));
-        singles.add(new MAlbum("Fortune Faded", 2004, ssongs2));
-
-        mainSection.loadSection(new MArtistPage("rhcp.jpg", "redhot.jpg",
-                "Red Hot Chili Peppers", mainSection.getWidth(), albums, singles, scene));*/
+        loadArtist(playingSong.getArtistId(), playingSong.getArtist());
     }
 }

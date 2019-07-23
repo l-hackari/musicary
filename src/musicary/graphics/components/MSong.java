@@ -32,7 +32,7 @@ public class MSong extends HBox {
     public MSong(Song song, Image playImage, Image pauseImage, MainController controller){
         this.song = song;
         this.controller = controller;
-        this.chartPosition = new MSongLabel(Integer.toString(song.getChartPosition()));
+        this.chartPosition = new MSongLabel(Integer.toString(song.getTrack_number()));
         songName = new MSongLabel(song.getTitle());
         this.playImage = playImage;
         this.pauseImage = pauseImage;
@@ -108,10 +108,6 @@ public class MSong extends HBox {
     public MSongLabel getArtist() {
         return artist;
     }
-
-    /*public ImageView getCoverImage() {
-        return coverImage;
-    }*/
 
     public MSongLabel getSongName() {
         return songName;

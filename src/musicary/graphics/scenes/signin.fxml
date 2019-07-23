@@ -26,7 +26,7 @@
                         <ImageView fitHeight="150.0" fitWidth="150.0" pickOnBounds="true"
                                    preserveRatio="true" AnchorPane.leftAnchor="75.0" AnchorPane.rightAnchor="75.0">
                             <image>
-                                <Image url="file:/home/zane/Development/Java%20Projects/musicary/res/images/musicary-logo.png" />
+                                <Image url="file:res/images/musicary-logo.png" />
                             </image>
                         </ImageView>
                     </children>
@@ -59,7 +59,7 @@
                         <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                     </VBox.margin>
                 </MBornDateField>
-                <MButton contentDisplay="CENTER" mnemonicParsing="false" text="Invia" onMouseClicked="#checkRegistration">
+                <MButton contentDisplay="CENTER" mnemonicParsing="false" text="Registrati" onMouseClicked="#checkRegistration">
                     <VBox.margin>
                         <Insets bottom="10.0" left="10.0" right="10.0" top="20.0" />
                     </VBox.margin>

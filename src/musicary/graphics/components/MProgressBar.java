@@ -14,6 +14,7 @@ import musicary.controllers.MainController;
 public class MProgressBar extends ProgressBar {
 
     private int actualSecond;
+    private MainController mainController;
 
     public MProgressBar(){
         this.setProgress(0.0);
@@ -22,7 +23,6 @@ public class MProgressBar extends ProgressBar {
     }
 
     public void setSeconds(double percentage){
-        System.out.println(percentage);
         this.setProgress(percentage);
     }
 
@@ -33,6 +33,7 @@ public class MProgressBar extends ProgressBar {
                 Bounds bd = MProgressBar.this.localToScene(MProgressBar.this.getBoundsInLocal());
                 double d = event.getSceneX() - bd.getMinX();
                 MProgressBar.this.setProgress((d / MProgressBar.this.getWidth()));
+                mainController.changeSongProgress(MProgressBar.this.getProgress());
             }
         });
     }
@@ -41,5 +42,9 @@ public class MProgressBar extends ProgressBar {
         this.setBackground(new Background(new BackgroundFill(Color.web("#000"),
                 new CornerRadii(0.0), new Insets(10.0, 10.0, 10.0, 10.0))));
         this.setPadding(new Insets(0.0));
+    }
+
+    public void setMainController(MainController mainController) {
+        this.mainController = mainController;
     }
 }

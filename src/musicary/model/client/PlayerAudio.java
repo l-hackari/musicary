@@ -5,6 +5,7 @@ import java.io.*;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javafx.application.Platform;
 import javazoom.jl.player.advanced.AdvancedPlayer;
 import javazoom.jl.player.advanced.PlaybackEvent;
 import javazoom.jl.player.advanced.PlaybackListener;
@@ -34,6 +35,11 @@ public class PlayerAudio {
 
     }
 
+    public Song getPlayerSong(){return song;}
+
+    public int getPausedOnFrame(){ return pausedOnFrame;}
+    public void setPausedOnFrame(int pausedOnFrame){ this.pausedOnFrame = pausedOnFrame;}
+
     private String secToString(int totalSecs){
         int hours = totalSecs / 3600;
         int minutes = (totalSecs % 3600) / 60;
@@ -43,6 +49,8 @@ public class PlayerAudio {
     }
 
     public Integer getSecond(){return second;}
+
+    public void setSecond(int second) {this.second = second;}
 
     public void setController(MainController controller) {
         this.controller = controller;
@@ -55,14 +63,20 @@ public class PlayerAudio {
             @Override
             public void playbackFinished(PlaybackEvent event) {
                 inPlay = false;
-                System.out.println("terminata");
+                if(pausedOnFrame >= end) {
+                    Platform.runLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            controller.playNextAudio(null);
+                        }
+                    });
+                }
             }
 
             @Override
             public void playbackStarted(PlaybackEvent event) {
                 controller.setEndSongTime(secToString(song.getDuration()));
                 inPlay = true;
-                System.out.println("iniziata");
             }
         });
         return inPlay;
@@ -75,7 +89,7 @@ public class PlayerAudio {
         TimerTask frame = new TimerTask() {
             @Override
             public void run() {
-                if (isRunning()) {
+                if (isPlaying()) {
                     pausedOnFrame += 39;
                     second++;
                     controller.incrementPBarSecond((double)second / (double)song.getDuration());

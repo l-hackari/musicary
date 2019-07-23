@@ -21,6 +21,7 @@ public class Song implements Serializable {
     private String title;
     private int duration;
     private String artist;
+    private String artistId;
     private String album;
     private String date;
     private String genre;
@@ -75,6 +76,10 @@ public class Song implements Serializable {
     public int getAlbumId() { return albumId; }
     public int getYearReleaseDate() { return yearReleaseDate; }
 
+    public String getArtistId() {
+        return artistId;
+    }
+
     public void setId(int id){this.id = id;}
     public void setDuration(int duration) {this.duration = duration;}
     public void setTitle(String title) {this.title = title;}
@@ -89,6 +94,10 @@ public class Song implements Serializable {
     public void setTracklistIndex(int tracklistIndex) { this.tracklistIndex = tracklistIndex; }
     public void setAlbumId(int albumId) { this.albumId = albumId; }
     public void setYearReleaseDate(int yearReleaseDate) { this.yearReleaseDate = yearReleaseDate; }
+
+    public void setArtistId(String artistId) {
+        this.artistId = artistId;
+    }
 
     public AudioInputStream getAudioInput() throws IOException, UnsupportedAudioFileException {
         URI uri = null;

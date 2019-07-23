@@ -318,11 +318,11 @@ public class ServiceManager implements Runnable {
     }
 
     public void sendAlbumSongs(String albumId, ArrayList<ArrayList<Song>> albums, int index) throws SQLException {
-        PreparedStatement statement = db.statement("SELECT brano.id, brano.titolo, brano.durata, " +
+        PreparedStatement statement = db.statement("SELECT brano.id, profilo_artista.id AS aid, brano.titolo, brano.durata, " +
                 "album.id AS album_id, album.anno_rilascio, album.nome, profilo_artista.nome AS nome_artista, brano.visualizzazioni, brano.track_number " +
                 "FROM brano, profilo_artista, album WHERE brano.album = album.id AND brano.artista = " +
                         "profilo_artista.id AND "
-                + "album.id = ? ORDER BY brano.track_number DESC");
+                + "album.id = ? ORDER BY brano.track_number ASC");
         statement.setString(1,albumId);
         ResultSet results = statement.executeQuery();
         albums.add(new ArrayList<Song>());
@@ -331,6 +331,7 @@ public class ServiceManager implements Runnable {
             song.setId(results.getInt("id"));
             song.setTitle(results.getString("titolo"));
             song.setArtist(results.getString("nome_artista"));
+            song.setArtistId(results.getString("aid"));
             song.setAlbumId(results.getInt("album_id"));
             song.setAlbum(results.getString("nome"));
             song.setDuration(results.getInt("durata"));
@@ -378,7 +379,8 @@ public class ServiceManager implements Runnable {
 
     public void sendTrackListForGenre(String genre) throws SQLException, IOException {
 
-        PreparedStatement statement = db.statement("SELECT brano.id, brano.titolo, brano.durata, " +
+        PreparedStatement statement = db.statement("SELECT brano.id, profilo_artista.id AS aid, " +
+                "brano.titolo, brano.durata, " +
                 "profilo_artista.nome AS nome_artista, " +
                 "brano.visualizzazioni, album.id AS album_id, " +
                 "brano.track_number, album.copertina, album.nome, genere.nome_genere " +
@@ -397,12 +399,13 @@ public class ServiceManager implements Runnable {
             song.setTracklistIndex(i);
             song.setTitle(results.getString("titolo"));
             song.setArtist(results.getString("nome_artista"));
+            song.setArtistId(results.getString("aid"));
             song.setAlbumId(results.getInt("album_id"));
             song.setAlbum(results.getString("nome"));
             song.setDuration(results.getInt("durata"));
             song.setGenre(results.getString("nome_genere"));
             song.setViews(results.getInt("visualizzazioni"));
-            song.setTrack_number(results.getInt("track_number"));
+            song.setTrack_number(i + 1);
             song.setCover(results.getString("copertina"));
             songs.add(song);
         }
@@ -413,7 +416,8 @@ public class ServiceManager implements Runnable {
 
     public void sendGlobalChart() throws SQLException, IOException {
 
-        PreparedStatement statement = db.statement("SELECT brano.id, brano.titolo, brano.durata, " +
+        PreparedStatement statement = db.statement("SELECT brano.id, profilo_artista.id AS aid , " +
+                "brano.titolo, brano.durata, " +
                 "profilo_artista.nome AS nome_artista, " +
                 "brano.visualizzazioni, album.id AS album_id, " +
                 "brano.track_number, album.copertina, album.nome, genere.nome_genere " +
@@ -430,12 +434,13 @@ public class ServiceManager implements Runnable {
             song.setTracklistIndex(i);
             song.setTitle(results.getString("titolo"));
             song.setArtist(results.getString("nome_artista"));
+            song.setArtistId(results.getString("aid"));
             song.setAlbumId(results.getInt("album_id"));
             song.setAlbum(results.getString("nome"));
             song.setDuration(results.getInt("durata"));
             song.setGenre(results.getString("nome_genere"));
             song.setViews(results.getInt("visualizzazioni"));
-            song.setTrack_number(results.getInt("track_number"));
+            song.setTrack_number(i + 1);
             song.setCover(results.getString("copertina"));
             songs.add(song);
         }

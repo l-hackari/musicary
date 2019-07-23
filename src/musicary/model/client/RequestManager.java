@@ -75,6 +75,15 @@ public class RequestManager implements Runnable {
         return in.readLine();
     }
 
+    public void setPausedOnframe (int pausedOnframe){
+        player.setPausedOnFrame(pausedOnframe);
+        player.setSecond(pausedOnframe/39);
+    }
+
+    public void getPausedOnFrame() { player.getPausedOnFrame();}
+
+    public Song getPlayerSong() { return player.getPlayerSong();}
+
     public void setController(MainController controller) {
         this.controller = controller;
     }
@@ -206,6 +215,8 @@ public class RequestManager implements Runnable {
 
     }
 
+    public boolean isPlaying() { return player.isPlaying();}
+
     public ArrayList<Song> getCurrentTrackList(){ return currentTrackList;}
 
     public void getAlbumCover(String albumId){
@@ -215,7 +226,7 @@ public class RequestManager implements Runnable {
                         File.separator + "images" + File.separator + "album" + File.separator
                         + "image.png").toString());
             sendRequest(albumId);
-            getImage(uri.getPath());
+            getImage(uri.getPath(), true);
         } catch (URISyntaxException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -232,7 +243,7 @@ public class RequestManager implements Runnable {
             sendRequest(artistId);
             String path = uri.getPath().substring(0, uri.getPath().length() - 9);
             path += artistId + ".png";
-            getImage(path);
+            getImage(path, false);
         } catch (URISyntaxException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -249,7 +260,7 @@ public class RequestManager implements Runnable {
                     + "image.png").toString());
             String path = uri.getPath().substring(0, uri.getPath().length() - 9);
             path += genreId + ".png";
-            getImage(path);
+            getImage(path, false);
 
             sendRequest("nextImage");
 
@@ -260,7 +271,7 @@ public class RequestManager implements Runnable {
 
             path = uri.getPath().substring(0, uri.getPath().length() - 9);
             path += genreId + ".png";
-            getImage(path);
+            getImage(path, false);
 
         } catch (URISyntaxException e) {
             e.printStackTrace();
@@ -278,7 +289,7 @@ public class RequestManager implements Runnable {
                     File.separator + "images" + File.separator + "singleArtist" + File.separator
                     + "profile.png").toString());
 
-            getImage(uri.getPath());
+            getImage(uri.getPath(), false);
 
             sendRequest("nextImage");
             uri = new URI(getClass().getResource(".." + File.separator + ".." + File.separator +
@@ -286,7 +297,7 @@ public class RequestManager implements Runnable {
                     File.separator + "images" + File.separator + "singleArtist" + File.separator
                     + "cover.png").toString());
 
-            getImage(uri.getPath());
+            getImage(uri.getPath(), false);
         } catch (URISyntaxException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -294,7 +305,7 @@ public class RequestManager implements Runnable {
         }
     }
 
-    public void getImage(String path){
+    public void getImage(String path, boolean isAlbumImage){
 
         try{
 
@@ -312,8 +323,8 @@ public class RequestManager implements Runnable {
 
             fos.flush();
 
-
-            controller.setPlayingSongImage();
+            if(isAlbumImage)
+                controller.setPlayingSongImage();
 
 
         } catch (IOException e) {
