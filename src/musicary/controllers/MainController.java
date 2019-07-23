@@ -14,6 +14,7 @@ import musicary.graphics.components.*;
 import musicary.graphics.panes.*;
 import musicary.model.Artist;
 import musicary.model.Song;
+import musicary.model.User;
 import musicary.model.client.RequestManager;
 import musicary.model.Genre;
 
@@ -51,6 +52,9 @@ public class MainController {
     private int executingArtist;
     private int currentPaneType;
     private int executingPaneType;
+    private User loggedUser;
+    private ProfileController profileController;
+    private LoginController loginController;
 
 
     @FXML
@@ -80,10 +84,28 @@ public class MainController {
     @FXML
     private Label endSongTime;
 
-
     @FXML
     private void initialize(){
-        loadHome(null);
+
+        playImage = new Image(getClass().getResourceAsStream( ".." +
+                File.separator + ".." + File.separator + ".." + File.separator + "res" + File.separator +
+                "components" + File.separator + "images" + File.separator +
+                "play.png"), 30.0, 30.0,true, ImageView.SMOOTH_DEFAULT);
+
+        pauseImage = new Image(getClass().getResourceAsStream(".." +
+                File.separator + ".." + File.separator + ".." + File.separator + "res" + File.separator +
+                "components" + File.separator + "images" + File.separator +
+                "pause.png"), 30.0, 30.0,true, ImageView.SMOOTH_DEFAULT);
+
+        playerPlayImage = new Image(getClass().getResourceAsStream(".." +
+                File.separator + ".." + File.separator + ".." + File.separator + "res" + File.separator +
+                "components" + File.separator + "images" + File.separator +
+                "play.png"));
+
+        playerPauseImage = new Image(getClass().getResourceAsStream(".." +
+                File.separator + ".." + File.separator + ".." + File.separator + "res" + File.separator +
+                "components" + File.separator + "images" + File.separator +
+                "pause.png"));
     }
 
     @FXML
@@ -131,75 +153,62 @@ public class MainController {
     }
 
     @FXML
-    private void doLogOut(MouseEvent mouseEvent) {
+    private void doLogOut(MouseEvent mouseEvent) throws IOException {
         BorderPane borderPane = (BorderPane) loginScene.getRoot();
         BorderPane thisBorderPane = (BorderPane) scene.getRoot();
         borderPane.setPrefWidth(thisBorderPane.getWidth());
         borderPane.setPrefHeight(thisBorderPane.getHeight());
+        requestManager.logOut();
         stage.setScene(loginScene);
     }
 
     @FXML
     private void loadProfilePage(MouseEvent mouseEvent) {
-        mainSection.loadSection(new MProfilePage());
+        mainSection.loadSection(new MProfilePage(this));
     }
 
     @FXML
     private void loadHome(MouseEvent mouseEvent) {
 
-        playImage = new Image(getClass().getResourceAsStream( ".." +
-                File.separator + ".." + File.separator + ".." + File.separator + "res" + File.separator +
-                "components" + File.separator + "images" + File.separator +
-                "play.png"), 30.0, 30.0,true, ImageView.SMOOTH_DEFAULT);
+        ArrayList<MArtistButton> martists = new ArrayList<>();
+        ArrayList<MArtistButton> martists2 = new ArrayList<>();
+        ArrayList<Artist> artists;
+        ArrayList<Artist> artists2;
+        try {
+            artists = requestManager.getMostPlayedArtists(Integer.toString(loggedUser.getId()));
+            artists = requestManager.getRecentPlayedArtists(Integer.toString(loggedUser.getId()));
+            for (int i = 0; i < artists.size(); i++) {
+                martists.add(new MArtistButton(artists.get(i).getNome(), artists.get(i).getId() + ".png"
+                        , artists.get(i).getId(), this));
+            }
 
-        pauseImage = new Image(getClass().getResourceAsStream(".." +
-                File.separator + ".." + File.separator + ".." + File.separator + "res" + File.separator +
-                "components" + File.separator + "images" + File.separator +
-                "pause.png"), 30.0, 30.0,true, ImageView.SMOOTH_DEFAULT);
+            for (int i = 0; i < artists.size(); i++) {
+                martists2.add(new MArtistButton(artists.get(i).getNome(), artists.get(i).getId() + ".png"
+                        , artists.get(i).getId(), this));
+            }
 
-        playerPlayImage = new Image(getClass().getResourceAsStream(".." +
-                File.separator + ".." + File.separator + ".." + File.separator + "res" + File.separator +
-                "components" + File.separator + "images" + File.separator +
-                "play.png"));
-
-        playerPauseImage = new Image(getClass().getResourceAsStream(".." +
-                File.separator + ".." + File.separator + ".." + File.separator + "res" + File.separator +
-                "components" + File.separator + "images" + File.separator +
-                "pause.png"));
-
-        /*ArrayList<MArtistButton> artists = new ArrayList<>();
-        ArrayList<MArtistButton> artists2 = new ArrayList<>();
-
-        for (int i = 0; i < 10; i++) {
-            if(i % 2 == 0)
-                artists.add(new MArtistButton("Red Hot Chili Peppers", "redhot.jpg", this));
-            else
-                artists.add(new MArtistButton("Muse", "redhot.jpg", this));
+            mainSection.loadSection(new MHomePage(martists, martists2));
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
-
-        for (int i = 0; i < 10; i++) {
-            if(i % 2 == 0)
-                artists2.add(new MArtistButton("Red Hot Chili Peppers", "redhot.jpg", this));
-            else
-                artists2.add(new MArtistButton("Muse", "redhot.jpg", this));
-        }
-
-        mainSection.loadSection(new MHomePage(artists, artists2));*/
-        loadProfilePage(null);
     }
 
     public void loadGenre(String text, String genreId){
         mainSection.loadSection(new MGenreChoose(genreId, text,this));
     }
 
-    public void setRequestManager(RequestManager requestManager) {
+    public void setRequestManager(RequestManager requestManager, User loggedUser) {
         this.requestManager = requestManager;
         this.requestManager.setController(this);
+        this.loggedUser = loggedUser;
+        loadHome(null);
     }
 
     private void requestSong(Song song, boolean canIStream){
         try {
-            requestManager.getSong(song, canIStream);
+            requestManager.getSong(song, canIStream, loggedUser);
         } catch (IOException e) {
             e.printStackTrace();
         } catch (UnsupportedAudioFileException e) {
@@ -250,6 +259,12 @@ public class MainController {
 
     }
 
+    public void setProfileController(ProfileController profileController) {
+        this.profileController = profileController;
+        profileController.setRequestManager(requestManager);
+        profileController.setLoggedUser(loggedUser);
+    }
+
     public void setScene(Scene scene) {
         this.scene = scene;
     }
@@ -258,9 +273,7 @@ public class MainController {
         this.stage = stage;
     }
 
-    public void setLoginScene(Scene loginScene) {
-        this.loginScene = loginScene;
-    }
+    public void setLoginScene(Scene loginScene) { this.loginScene = loginScene;}
 
     public void incrementPBarSecond(double percentage){
         progressBar.setSeconds(percentage);

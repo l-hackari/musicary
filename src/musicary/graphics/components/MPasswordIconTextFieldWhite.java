@@ -32,4 +32,8 @@ public class MPasswordIconTextFieldWhite extends BorderPane {
         MPasswordIconTextField.setMargin(imageView, new Insets(5.0));
     }
 
+    public String getTextFieldValue(){
+        return passwordField.getText();
+    }
+
 }

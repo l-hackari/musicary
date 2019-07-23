@@ -1,13 +1,8 @@
 package musicary.model.client;
 
-import javax.sound.sampled.UnsupportedAudioFileException;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
-
-
-import static java.lang.System.*;
 
 public class Client {
 
@@ -16,24 +11,12 @@ public class Client {
     private RequestManager requestManager;
 
 
-    public Socket connect() throws UnsupportedAudioFileException {
+    public Socket connect() throws IOException {
 
-        try {
-
-            Socket clientSocket = new Socket(InetAddress.getLocalHost(), porta);
-            requestManager = new RequestManager(clientSocket);
-            Thread ThreadrequestManager = new Thread(requestManager);
-            ThreadrequestManager.start();
-
-        } catch (UnknownHostException e) {
-
-            err.println("host sconosciuto");
-
-        } catch (IOException e) {
-
-            e.printStackTrace();
-
-        }
+        Socket clientSocket = new Socket(InetAddress.getLocalHost(), porta);
+        requestManager = new RequestManager(clientSocket);
+        Thread ThreadrequestManager = new Thread(requestManager);
+        ThreadrequestManager.start();
 
         return client;
     }

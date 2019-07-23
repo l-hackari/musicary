@@ -1,4 +1,5 @@
 package musicary.graphics.components;
+
 import javafx.geometry.Insets;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -14,7 +15,7 @@ public class MUsernameField extends BorderPane {
     public MUsernameField() {
         textField = new MTextField();
         imageView = new ImageView(new Image(getClass().getResourceAsStream(".." + File.separator + ".." + File.separator +
-                ".." + File.separator + ".." + File.separator + "res" + File.separator +  "components" + File.separator +
+                ".." + File.separator + ".." + File.separator + "res" + File.separator + "components" + File.separator +
                 "images" + File.separator + "username.png"),
                 24.0, 24.0, true, ImageView.SMOOTH_DEFAULT));
         this.setLeft(imageView);
@@ -23,11 +24,16 @@ public class MUsernameField extends BorderPane {
         setTextFieldProperties();
     }
 
-    private void setImageViewProperties(){
+    private void setImageViewProperties() {
         MUsernameField.setMargin(imageView, new Insets(5.0));
     }
 
-    private void setTextFieldProperties(){
+    private void setTextFieldProperties() {
         textField.setPromptText("Username");
     }
+
+    public String getTextFieldValue() {
+        return textField.getText();
+    }
+
 }

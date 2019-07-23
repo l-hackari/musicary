@@ -1,5 +1,6 @@
 package musicary.graphics.components;
 
+
 import javafx.geometry.Insets;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -12,10 +13,10 @@ public class MPasswordIconTextField extends BorderPane {
     private MPasswordField passwordField;
     private ImageView imageView;
 
-    public MPasswordIconTextField(){
+    public MPasswordIconTextField() {
         passwordField = new MPasswordField();
         imageView = new ImageView(new Image(getClass().getResourceAsStream(".." + File.separator + ".." + File.separator +
-                ".." + File.separator + ".." + File.separator + "res" + File.separator +  "components" + File.separator +
+                ".." + File.separator + ".." + File.separator + "res" + File.separator + "components" + File.separator +
                 "images" + File.separator + "password.png"),
                 24.0, 24.0, true, ImageView.SMOOTH_DEFAULT));
         this.setLeft(imageView);
@@ -24,11 +25,15 @@ public class MPasswordIconTextField extends BorderPane {
         setPasswordFieldProperties();
     }
 
-    private void setPasswordFieldProperties(){
+    private void setPasswordFieldProperties() {
         passwordField.setPromptText("Password");
     }
 
-    private void setImageViewProperties(){
+    private void setImageViewProperties() {
         MPasswordIconTextField.setMargin(imageView, new Insets(5.0));
+    }
+
+    public String getPasswordFieldValue() {
+        return  passwordField.getText();
     }
 }

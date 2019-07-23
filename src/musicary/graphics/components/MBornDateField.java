@@ -23,11 +23,13 @@ public class MBornDateField extends BorderPane {
         setTextFieldProperties();
     }
 
+    public String getBornDate(){ return textField.getText(); }
+
     private void setImageViewProperties(){
         MUsernameField.setMargin(imageView, new Insets(5.0));
     }
 
     private void setTextFieldProperties(){
-        textField.setPromptText("Data di nascita");
+        textField.setPromptText("Data di nascita (GG/MM/AAAA)");
     }
 }

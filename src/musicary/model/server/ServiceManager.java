@@ -4,15 +4,22 @@ import musicary.model.Artist;
 import musicary.model.Genre;
 import musicary.model.Song;
 import musicary.model.User;
+import sun.security.provider.MD5;
 
 import java.io.*;
+import java.math.BigInteger;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 
 
 public class ServiceManager implements Runnable {
@@ -161,12 +168,12 @@ public class ServiceManager implements Runnable {
     }
 
     public void sendSong() throws IOException {
-        try {
 
-            sendAlbumCover();
-            System.out.println("in attesa di un nome per la canzone");
+        try {
+            String userId = getRequest();
             String nameSong = getRequest();
-            System.out.println(nameSong);
+            listenSong(nameSong, userId);
+            sendAlbumCover();
             URI uri = new URI(getClass().getResource(".." + File.separator + ".." + File.separator +
                     ".." + File.separator + ".." + File.separator + "res" + File.separator + "server" +
                     File.separator + "songs" + File.separator + nameSong + ".mp3").toString());
@@ -221,6 +228,52 @@ public class ServiceManager implements Runnable {
 
 
     }*/
+
+
+
+
+    public void sendMostPlayedArtists(String userId) throws SQLException, IOException {
+        PreparedStatement statement = db.statement("SELECT profilo_artista.nome, profilo_artista.id FROM " +
+                "profilo_artista, numVisualizzazioniPerUtente " +
+                "WHERE numVisualizzazioniPerUtente.idUtente = ? AND numVisualizzazioniPerUtente.idArtista = profilo_artista.id " +
+                "ORDER BY numVisualizzazioniPerUtente.numVisual DESC LIMIT 10");
+        statement.setString(1,userId.toLowerCase());
+        ResultSet reslts = statement.executeQuery();
+        artists.clear();
+        while(reslts.next()){
+
+            Artist artist = new Artist();
+            artist.setNome(reslts.getString("nome"));
+            artist.setId(reslts.getInt("id"));
+            artists.add(artist);
+        }
+
+        objectOut.writeObject(artists.clone());
+        objectOut.flush();
+    }
+
+    public void sendRecentPlayedArtists(String userId) throws SQLException, IOException {
+        PreparedStatement statement = db.statement("SELECT profilo_artista.id, profilo_artista. nome " +
+                "FROM profilo_artista " +
+                "WHERE profilo_artista.id IN (SELECT DISTINCT(profilo_artista.id) " +
+                "FROM profilo_artista, ascolti, brano " +
+                "WHERE ascolti.id_utente = ? AND ascolti.id_brano = brano.id AND brano.artista = profilo_artista.id " +
+                "ORDER BY ascolti.istante DESC) " +
+                "LIMIT 10");
+        statement.setString(1,userId.toLowerCase());
+        ResultSet reslts = statement.executeQuery();
+        artists.clear();
+        while(reslts.next()){
+
+            Artist artist = new Artist();
+            artist.setNome(reslts.getString("nome"));
+            artist.setId(reslts.getInt("id"));
+            artists.add(artist);
+        }
+
+        objectOut.writeObject(artists.clone());
+        objectOut.flush();
+    }
 
     public void sendArtistList(String genre) throws SQLException, IOException {
 
@@ -412,41 +465,87 @@ public class ServiceManager implements Runnable {
 
     }
 
+    public void listenSong(String songId, String userId) {
 
-    public void Login() throws SQLException, IOException, ClassNotFoundException, InterruptedException {
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+
+        PreparedStatement statement = db.statement("INSERT INTO ascolti VALUES(?, ?, ?)");
+        try {
+            statement.setString(1,songId);
+            statement.setString(2,userId);
+            statement.setTimestamp(3,timestamp);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            System.out.println("Server: errore nella sinstassi della query inserita per l'inserimento di un ascolto");
+        }
+    }
+
+
+    public void Login() throws SQLException, IOException, ClassNotFoundException{
 
         User user = (User) objectIn.readObject();
         PreparedStatement statement = db.statement("SELECT * FROM utente WHERE utente.username = ? AND utente.password = ?");
+
         statement.setString(1, user.getUsername());
         statement.setString(2, user.getPassword());
         ResultSet results = statement.executeQuery();
-        if(results.next()) sendService("logged");
-        else sendService("not logged");
+
+        if(results.next()){
+            sendService("logged");
+            statement = db.statement("SELECT utente.id FROM utente WHERE utente.username = ?");
+            statement.setString(1, user.getUsername());
+            results = statement.executeQuery();
+            results.next();
+            user.setId(results.getInt("id"));
+            objectOut.writeObject(user);
+            objectOut.flush();
+
+        } else {
+            sendService("not logged");
+        }
+
+    }
+
+    public void changePassword() throws IOException, ClassNotFoundException, SQLException {
+        User user = (User) objectIn.readObject();
+        PreparedStatement statement = db.statement("UPDATE utente SET password = ? WHERE username = ?");
+
+        statement.setString(1, user.getPassword());
+        statement.setString(2, user.getUsername());
+
+        int count = statement.executeUpdate();
+
+        if(count > 0){
+            sendService("changed");
+        } else {
+            sendService("not changed");
+        }
 
     }
 
 
     public void SignUp() throws IOException, ClassNotFoundException {
         User user = (User) objectIn.readObject();
-        PreparedStatement statement = db.statement("INSERT INTO utente (username, password, email) VALUES (?,?,?)");
+        PreparedStatement statement = db.statement("INSERT INTO utente (username, password, email, datanascita)" +
+                " VALUES (?,?,?,?)");
+
         try {
             statement.setString(1, user.getUsername());
             statement.setString(2, user.getPassword());
             statement.setString(3, user.getEmail());
+            statement.setDate(4, user.getBornDate());
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("Server: I dati inseriti nello statement non corrispondono alle richiste");
         }
 
 
         try {
             statement.execute();
             sendService("registered");
-        }
-        catch (com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException e){
-            sendService("utente già esistente");
-        }
-        catch (SQLException e) {
-            System.out.println("errore nell'invio della query");
+        } catch (com.mysql.jdbc.exceptions.jdbc4.MySQLIntegrityConstraintViolationException e){
+            sendService("alreadyExistingFields");
+        } catch (SQLException e) {
+            System.out.println("Server: Errore di sintassi nella query di registrazione di un nuovo utente");
             e.printStackTrace();
         }
 
@@ -491,6 +590,12 @@ public class ServiceManager implements Runnable {
                     sendGenres();
                 } else if(req.equals("getGenresImages")){
                     sendGenreImages(getRequest());
+                } else if(req.equals("getMostPlayedArtists")){
+                    sendMostPlayedArtists(getRequest());
+                } else if(req.equals("getRecentPlayedArtists")){
+                    sendRecentPlayedArtists(getRequest());
+                } else if(req.equals("changePassword")){
+                    changePassword();
                 }
             }
 

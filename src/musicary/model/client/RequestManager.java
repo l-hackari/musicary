@@ -24,13 +24,15 @@ public class RequestManager implements Runnable {
     private ArrayList<Song> requestedTracklist;
     private ArrayList<Artist> artistsList = new ArrayList<Artist>();
 
-    PlayerAudio player;
+    private PlayerAudio player;
     private DataInputStream in;
     private DataOutputStream out;
 
     private ObjectInputStream objectIn;
     private ObjectOutputStream objctOut;
     private MainController controller;
+
+    private User user;
 
     private String comando = "";
 
@@ -52,6 +54,19 @@ public class RequestManager implements Runnable {
         objctOut = new ObjectOutputStream(socket.getOutputStream());
         currentTrackList = new ArrayList<>();
         requestedTracklist = new ArrayList<>();
+    }
+
+    public void logOut() throws IOException {
+
+        if(player != null)
+            if(player.isPlaying())
+                player.pause();
+
+        in.close();
+        out.close();
+        objectIn.close();
+        objctOut.close();
+
     }
 
 
@@ -111,6 +126,28 @@ public class RequestManager implements Runnable {
         return artistsList;
     }
 
+    public ArrayList<Artist> getMostPlayedArtists(String userId) throws IOException, ClassNotFoundException {
+        sendRequest("getMostPlayedArtists");
+        sendRequest(userId);
+        artistsList = (ArrayList<Artist>)objectIn.readObject();
+        for (int i = 0; i < artistsList.size(); i++) {
+            sendRequest("getArtistProfileImage");
+            getArtistImage(Integer.toString(artistsList.get(i).getId()));
+        }
+        return artistsList;
+    }
+
+    public ArrayList<Artist> getRecentPlayedArtists(String userId) throws IOException, ClassNotFoundException {
+        sendRequest("getRecentPlayedArtists");
+        sendRequest(userId);
+        artistsList = (ArrayList<Artist>)objectIn.readObject();
+        for (int i = 0; i < artistsList.size(); i++) {
+            sendRequest("getArtistProfileImage");
+            getArtistImage(Integer.toString(artistsList.get(i).getId()));
+        }
+        return artistsList;
+    }
+
     public ArrayList<Genre> getGenres() throws IOException, ClassNotFoundException {
         sendRequest("getGenres");
         ArrayList<Genre> genres = (ArrayList<Genre>)objectIn.readObject();
@@ -143,7 +180,6 @@ public class RequestManager implements Runnable {
         return requestedTracklist;
 
     }
-
 
     public void PlayBack() {
         Thread playBack = new Thread(new Runnable() {
@@ -287,8 +323,7 @@ public class RequestManager implements Runnable {
 
     }
 
-
-    public void getSong(Song songToStream, boolean canIStream) throws IOException, UnsupportedAudioFileException, InterruptedException {
+    public void getSong(Song songToStream, boolean canIStream, User user) throws IOException, UnsupportedAudioFileException, InterruptedException {
 
         if(currentTrackList != requestedTracklist){
             if(requestedTracklist.contains(songToStream)) {
@@ -302,8 +337,9 @@ public class RequestManager implements Runnable {
                 try {
 
                     if (canIStream) {
-                        getAlbumCover(Integer.toString(songToStream.getAlbumId()));
+                        sendRequest(Integer.toString(user.getId()));
                         sendRequest(Integer.toString(songToStream.getId()));
+                        getAlbumCover(Integer.toString(songToStream.getAlbumId()));
                         int bufSize = 1024 * 16;
                         byte[] bytes = new byte[bufSize];
 
@@ -343,7 +379,7 @@ public class RequestManager implements Runnable {
                         while(player.isPlaying()) {
                             //sleep
                         }
-                        
+
                         PlayBack();
                     }
 
@@ -431,13 +467,32 @@ public class RequestManager implements Runnable {
 
     }*/
 
-    public boolean Login(User user) throws IOException {
+    public User getLoggedUser(){return user;}
+
+
+    public boolean changePassword(User user) throws IOException, ClassNotFoundException {
 
         objctOut.writeObject(user);
         objctOut.flush();
 
-        if(getRequest().equals("logged")) return true;
-        else return false;
+        if(getRequest().equals("changed")) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean Login(User user) throws IOException, ClassNotFoundException {
+
+        objctOut.writeObject(user);
+        objctOut.flush();
+
+        if(getRequest().equals("logged")) {
+            this.user = (User) objectIn.readObject();
+            return true;
+        }
+
+        return false;
 
     }
 
@@ -448,8 +503,10 @@ public class RequestManager implements Runnable {
 
         String req = getRequest();
         System.out.println(req);
-        if(req.equals("registered")) return true;
-        else return false;
+        if(req.equals("registered"))
+            return true;
+
+        return false;
     }
 
 
@@ -461,6 +518,8 @@ public class RequestManager implements Runnable {
             e.printStackTrace();
         }
     }
+
+
 
     @Override
     public void run() {
@@ -479,16 +538,6 @@ public class RequestManager implements Runnable {
             } else if (comando.equals("login")) {
                 try {
                     sendRequest("login");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                User user = new User("Davide", "davide99");
-                try {
-                    if (Login(user)) {
-                        System.out.println("logged");
-                    } else {
-                        System.out.println("not logged");
-                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

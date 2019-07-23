@@ -30,4 +30,8 @@ public class MEmailField extends BorderPane {
     private void setTextFieldProperties(){
         textField.setPromptText("Email");
     }
+
+    public String getTextFieldValue() {
+        return textField.getText();
+    }
 }
